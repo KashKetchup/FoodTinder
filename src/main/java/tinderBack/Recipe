@@ -1,0 +1,10 @@
+package tinderBack;
+
+public interface Recipe {
+    public Ingredient[] getIngredients();
+    public FoodTag[] getTags();
+
+    public String getName();
+    public String getImagePath();
+
+}
