@@ -1,10 +1,5 @@
 package tinderBack;
 
-public interface Ingredient {
-    public String getName();
-    public int getId();
-}
-
 public class Ingredient {
     private int id;
     private String name;

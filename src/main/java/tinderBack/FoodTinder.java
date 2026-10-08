@@ -1,10 +1,5 @@
 package tinderBack;
 
-import FoodTag;
-import Ingredient;
-import Recipe;
-import FullRecipe;
-
 public interface FoodTinder {
     public Ingredient[] getAllIngredients();
     public FoodTag[] getAllTags();

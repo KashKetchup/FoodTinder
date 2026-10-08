@@ -1,7 +1,5 @@
 package tinderBack;
 
-import Recipe;
-
 public interface FullRecipe extends Recipe {
     public String getIntructions();
 }
