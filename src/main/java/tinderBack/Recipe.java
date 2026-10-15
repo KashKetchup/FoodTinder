@@ -1,6 +1,6 @@
 package tinderBack;
 
-class Recipe {
+public class Recipe {
     private final int m_recipeId;
     private final Ingredient[] m_ingredients;
     private final FoodTag[] m_tags;
