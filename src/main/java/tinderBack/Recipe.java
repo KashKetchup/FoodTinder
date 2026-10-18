@@ -1,31 +1,36 @@
 package tinderBack;
 
+import java.util.Set;
+
 public class Recipe {
     private final int m_recipeId;
-    private final Ingredient[] m_ingredients;
-    private final FoodTag[] m_tags;
+    private final Set<Ingredient> m_ingredients;
+    private final Set<FoodTag> m_tags;
     private final String m_name;
+    private final String m_desc;
     private final String m_imagePath;
     private final int m_cookingTime;
     private final int m_rate;
-    private final float m_calories;
+    private final double m_calories;
     private final int m_difficulty;
 
     public Recipe(
         int id,
         String name, 
-        Ingredient[] ingredients, 
-        FoodTag[] tags, 
+        String description,
+        Set<Ingredient> ingredients, 
+        Set<FoodTag> tags, 
         String imagePath,
         int cookingTime,
         int rate,
-        float calories,
+        double calories,
         int difficulty
     ) {
         m_recipeId = id;
         m_ingredients = ingredients;
         m_tags = tags;
         m_name = name;
+        m_desc = description;
         m_imagePath = imagePath;
         m_cookingTime = cookingTime;
         m_rate = rate;
@@ -39,13 +44,16 @@ public class Recipe {
     public String getName() {
         return m_name;
     }
+    public String getDescription() {
+        return m_desc;
+    }
     public String getImagePath() {
         return m_imagePath;
     }
     public int getCookingTime() {
         return m_cookingTime;
     }
-    public float getCalories() {
+    public double getCalories() {
         return m_calories;
     }
     public int getRate() {
@@ -55,10 +63,10 @@ public class Recipe {
         return m_difficulty;
     }
 
-    public Ingredient[] getIngredients() {
+    public Set<Ingredient> getIngredients() {
         return m_ingredients;
     }
-    public FoodTag[] getTags() {
+    public Set<FoodTag> getTags() {
         return m_tags;
     }
 }
