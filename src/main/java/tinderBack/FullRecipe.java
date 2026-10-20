@@ -1,9 +1,11 @@
 package tinderBack;
 
+import java.util.List;
+
 public record FullRecipe(
     int m_recipeId,
-    Ingredient[] m_ingredients,
-    FoodTag[] m_tags,
+    List<Ingredient> m_ingredients,
+    List<FoodTag> m_tags,
     String m_name,
     String m_imagePath,
     int m_cookingTime,
