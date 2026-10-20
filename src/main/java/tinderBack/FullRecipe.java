@@ -1,16 +1,16 @@
 package tinderBack;
 
-import java.util.List;
+import java.util.Set;
 
 public record FullRecipe(
     int m_recipeId,
-    List<Ingredient> m_ingredients,
-    List<FoodTag> m_tags,
     String m_name,
+    String instruction,
+    Set<Ingredient> m_ingredients,
+    Set<FoodTag> m_tags,
     String m_imagePath,
     int m_cookingTime,
     int m_rate,
-    float m_calories,
-    int m_difficulty,
-    String instruction
+    double m_calories,
+    int m_difficulty 
 ) {}
