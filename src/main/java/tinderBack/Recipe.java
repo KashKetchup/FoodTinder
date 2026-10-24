@@ -6,6 +6,7 @@ public record Recipe(
     int m_recipeId,
     String m_name,
     String m_description,
+    String instruction,
     Set<Ingredient> m_ingredients,
     Set<FoodTag> m_tags,
     String m_imagePath,
