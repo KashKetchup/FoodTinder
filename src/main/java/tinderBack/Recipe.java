@@ -3,15 +3,15 @@ package tinderBack;
 import java.util.Set;
 
 public record Recipe(
-    int m_recipeId,
-    String m_name,
-    String m_description,
+    int recipeId,
+    String name,
+    String description,
     String instruction,
-    Set<Ingredient> m_ingredients,
-    Set<FoodTag> m_tags,
-    String m_imagePath,
-    int m_cookingTime,
-    int m_rate,
-    double m_calories,
-    int m_difficulty
+    Set<Ingredient> ingredients,
+    Set<FoodTag> tags,
+    String imagePath,
+    int cookingTime,
+    int rate,
+    double calories,
+    int difficulty
 ) {}

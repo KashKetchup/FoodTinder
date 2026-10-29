@@ -51,7 +51,7 @@ public class FoodTinder {
         }  
     }
 
-    public FullRecipe getRecipe(int id) throws FTException {
+    public Recipe getRecipe(int id) throws FTException {
         try {
             return m_dbService.getRecipe(id);
         } catch (DBException dbe) {
