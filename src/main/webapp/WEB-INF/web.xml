@@ -8,7 +8,7 @@
     <response-character-encoding>UTF-8</response-character-encoding>
 
     <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
+        <welcome-file>index.jsp</welcome-file>
     </welcome-file-list>
 
     <servlet>
@@ -30,5 +30,15 @@
     <servlet-mapping>
         <servlet-name>recipePage</servlet-name>
         <url-pattern>/recipe</url-pattern>
+    </servlet-mapping>
+
+     <servlet>
+        <servlet-name>main</servlet-name>
+        <servlet-class>com.example.RecipeServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>main</servlet-name>
+        <url-pattern>/recipes</url-pattern>
     </servlet-mapping>
 </web-app>
