@@ -1,6 +1,7 @@
 package tinderBack;
 
 import java.util.Set;
+import java.util.HashSet;
 import java.util.List;
 import database.*;
 
@@ -31,6 +32,8 @@ public class FoodTinder {
         }
     }
 
+    //TEST EXAMPLE
+
     public List<Recipe> findRecomendRecipes (
         Set<Integer> includedTags, 
         Set<Integer> excludedTags,
@@ -38,23 +41,38 @@ public class FoodTinder {
         Set<Integer> excludedIngr
     ) throws FTException {
         try {
-            return m_dbService.getRecipesByTags
-            (
-                5, 
-                includedTags, 
-                includedIngr, 
-                excludedTags, 
-                excludedIngr
-            );
-        } catch (DBException dbe) {
+
+            Set<Ingredient> ingr = new HashSet<>();
+            Set<FoodTag> tags = new HashSet<>();
+            Recipe rec1 = new Recipe(1, "Plov", "Plov - plov", "Do some thing", ingr, tags, "./home/al6ed0/Изображения/Emote_60000398.png", 1000, 1, 10.2, 100);
+
+            return List.of(rec1, rec1); 
+
+            // return m_dbService.getRecipesByTags
+            // (
+            //     5, 
+            //     includedTags, 
+            //     includedIngr, 
+            //     excludedTags, 
+            //     excludedIngr
+            // );
+
+            //DBException
+        } catch (Exception dbe) {
             throw new FTException(dbe.getMessage());
         }  
     }
 
+    //TEST EXAMPLE
+
     public Recipe getRecipe(int id) throws FTException {
         try {
-            return m_dbService.getRecipe(id);
-        } catch (DBException dbe) {
+            Set<Ingredient> ingr = new HashSet<>();
+            Set<FoodTag> tags = new HashSet<>();
+            return new Recipe(1, "Plov", "Plov - plov", "Do some thing", ingr, tags, "./home/al6ed0/Изображения/Emote_60000398.png", 1000, 1, 10.2, 100);
+        
+            //DBException
+        } catch (Exception dbe) {
             throw new FTException(dbe.getMessage());
         }
     }

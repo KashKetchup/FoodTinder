@@ -4,6 +4,7 @@ import java.net.URI;
 
 import database.DatabaseService;
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import tinderBack.FoodTinder;
 
 public class TomcatIntegration {
@@ -24,11 +25,11 @@ public class TomcatIntegration {
         
         return result;
     }
-    public static FoodTinder getFoodTinder(ServletContext ctx) throws TomcatIntegrationException {
+    public static FoodTinder getFoodTinder(ServletContext ctx) throws TomcatIntegrationException, ServletException {
         FoodTinder result = (FoodTinder)ctx.getAttribute("tinderBack.FoodTinder");
         if (result == null) {
-            DatabaseService dbs = getDataBase(ctx);
-            result = new FoodTinder(dbs);
+            //DatabaseService dbs = getDataBase(ctx);
+            result = new FoodTinder(null);
             ctx.setAttribute("tinderBack.FoodTinder", result);
         }
         

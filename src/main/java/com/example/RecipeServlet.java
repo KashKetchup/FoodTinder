@@ -10,6 +10,7 @@ import java.util.List;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,17 +21,6 @@ public class RecipeServlet extends FTServlet{
     @Override 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
     throws ServletException, IOException {
-
-        //Настройка для работы с React
-
-        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-        resp.setHeader("Access-Control-Allow-Methods", "GET, POST");
-        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
-        resp.setContentType("application/json");
-        resp.setCharacterEncoding("UTF-8");
-
-        //Отправляем запрос к БД и парсим ответ, затем отправляем на React
 
         PrintWriter out = resp.getWriter();
 
@@ -44,26 +34,11 @@ public class RecipeServlet extends FTServlet{
             List<Recipe> recipes = foodTinder.findRecomendRecipes(includeTag, excludeTag,
                 includeIngredient, excludeIngredient);
 
-            for (Recipe recipe : recipes) {
-                String jsonOut = String.format(
-                    "{\"id\": \"%d\"" + 
-                    ", \"title\": \"%s\"" + 
-                    ", \"description\": \"%s\"" + 
-                    ", \"instruction\": \"%s\"" +
-                    ", \"image_url\": \"%s\"" +
-                    ", \"cookingTime\": \"%d\"" +
-                    ", \"rate\": \"%d\"" +
-                    ", \"calories\": \"%f\"" +
-                    ", \"difficulty\": \"%d\"}",
-                    recipe.recipeId(), recipe.name(), recipe.description(),
-                    recipe.instruction(), recipe.imagePath(),
-                    recipe.cookingTime(), recipe.rate(), 
-                    recipe.calories(), recipe.difficulty()
-                );
+            req.setAttribute("recipes", recipes);
+            
 
-                out.print(jsonOut);
-                //Либо собрать в массив и отправить разом
-            }
+            RequestDispatcher dispatcher = req.getRequestDispatcher("WEB-INF/views/main.jsp");
+            dispatcher.forward(req, resp);
 
         } catch (NumberFormatException | FTException e) {
             //TODO Подумать над реализацией исключений
@@ -86,3 +61,34 @@ public class RecipeServlet extends FTServlet{
     }
 }
 
+
+
+
+        // resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        // resp.setHeader("Access-Control-Allow-Methods", "GET, POST");
+        // resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+        // resp.setContentType("application/json");
+        // resp.setCharacterEncoding("UTF-8");
+
+
+// for (Recipe recipe : recipes) {
+//                 String jsonOut = String.format(
+//                     "{\"id\": \"%d\"" + 
+//                     ", \"title\": \"%s\"" + 
+//                     ", \"description\": \"%s\"" + 
+//                     ", \"instruction\": \"%s\"" +
+//                     ", \"image_url\": \"%s\"" +
+//                     ", \"cookingTime\": \"%d\"" +
+//                     ", \"rate\": \"%d\"" +
+//                     ", \"calories\": \"%f\"" +
+//                     ", \"difficulty\": \"%d\"}",
+//                     recipe.recipeId(), recipe.name(), recipe.description(),
+//                     recipe.instruction(), recipe.imagePath(),
+//                     recipe.cookingTime(), recipe.rate(), 
+//                     recipe.calories(), recipe.difficulty()
+//                 );
+
+//                 out.print(jsonOut);
+//                 //Либо собрать в массив и отправить разом
+// }
