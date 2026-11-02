@@ -16,7 +16,6 @@ import javax.sql.rowset.RowSetProvider;
 import tinderBack.FoodTag;
 import tinderBack.Ingredient;
 import tinderBack.Recipe;
-import tinderBack.FullRecipe;
 
 import java.net.URI;
 import java.sql.Connection;
@@ -288,14 +287,15 @@ public class DatabaseService {
 	 * @throws DBException если произошла ошибка при работе с базой данных
 	 * @see Recipe
 	 */
-	public FullRecipe getRecipe(int recipeId) throws DBException {
+	public Recipe getRecipe(int recipeId) throws DBException {
 		CachedRowSet res = queryRecFromDB(recipeId);
 		try {
 			if (res.next()) {
-				return new FullRecipe(
+				return new Recipe(
 						res.getInt("id"),
 						res.getString("name"),
 						res.getString("description"),
+						res.getString("instructions"),
 						getIngredientsByRecipe(recipeId),
 						getTagsByRecipe(recipeId),
 						"image_path", //TODO откуда брать адрес изображения?
@@ -376,6 +376,7 @@ public class DatabaseService {
 						recipeId,
 						res.getString("name"),
 						res.getString("description"),
+						res.getString("instructions"),
 						getIngredientsByRecipe(recipeId),
 						getTagsByRecipe(recipeId),
 						"image_path", //TODO откуда брать адрес изображения?
