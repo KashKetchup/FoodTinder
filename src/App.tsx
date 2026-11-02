@@ -12,7 +12,7 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<HomeScreen />} />
-        <Route path="/recipe/:id" element={<RecipeDetailScreen />} />
+        <Route path="/recipe" element={<RecipeDetailScreen />} />
         <Route path="/search" element={<SearchScreen />} />
         <Route path="/login" element={<LoginScreen />} />
         <Route path="/register" element={<RegisterScreen />} />

@@ -1,34 +1,38 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom'; // Добавили useLocation
 import './HomeScreen.css';
 
-const fetchRecipes = async () => {
-  return [
-    {
-      id: 1,
-      title: "Борщ классический",
-      description: "Наваристый суп со свеклой, капустой и сметаной. Настоящая классика.",
-      image_url: "https://images.unsplash.com/photo-1547592180-85f173990554?w=500&auto=format&fit=crop&q=60"
-    },
-    {
-      id: 2,
-      title: "Паста Карбонара",
-      description: "Итальянская паста с беконом, яйцом и сыром пармезан. Готовится за 15 минут.",
-      image_url: "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=500&auto=format&fit=crop&q=60"
-    },
-    {
-      id: 3,
-      title: "Панкейки с ягодами",
-      description: "Пышные американские блинчики с кленовым сиропом и свежей клубникой.",
-      image_url: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500&auto=format&fit=crop&q=60"
-    }
-  ];
-};
+// ИНТЕРФЕЙС
+interface Recipe {
+  id: number;
+  name: string;
+  description: string;
+  instruction: string;
+  ingredients: Object;
+  tags: Object;
+  image_url: string;
+  cookingTime: number;
+  rate: number;
+  calories: number;
+  difficulty: number;
+}
 
 export default function HomeScreen() {
-  const [recipes, setRecipes] = useState<any[]>([]);
+  const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
+  const fetchRecipes = async () => {
+    return fetch(`/backend/main`)
+        .then((response) => {
+          setLoading(false);
+          return response.json();
+        })
+        .catch((error) => {
+          console.error('Ошибка загрузки рецептов:', error);
+          setLoading(false);
+        });
+  };
+
   const navigate = useNavigate();
   const location = useLocation(); // Получаем текущий путь (например, '/')
 
@@ -48,7 +52,7 @@ export default function HomeScreen() {
   };
 
   const handleRecipePress = (recipe: any) => {
-    navigate(`/recipe/${recipe.id}`);
+    navigate(`/recipe?id=${recipe.id}`);
   };
 
   // Универсальный обработчик навигации с проверкой текущего пути
@@ -83,11 +87,11 @@ export default function HomeScreen() {
           >
             <img
               src={recipe.image_url}
-              alt={recipe.title}
+              alt={recipe.name}
               className="recipe-image"
             />
             <div className="recipe-info">
-              <h2 className="recipe-title">{recipe.title}</h2>
+              <h2 className="recipe-title">{recipe.name}</h2>
               <p className="recipe-description">{recipe.description}</p>
             </div>
           </div>
