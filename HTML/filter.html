@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Фильтр</title>
+</head>
+
+<body>
+
+<section class="filter">
+
+    <h1>Фильтр</h1>
+
+    <section class="black-list">
+
+        <h2>Black list ингредиентов / тегов</h2>
+
+        <ul>
+
+            <!-- TEMPLATE ингредиент из блеклиста -->
+            <li>
+                BLACKLIST_ITEM
+            </li>
+
+        </ul>
+
+        <!-- TEMPLATE поиск/добавление в блеклист -->
+        <input
+            type="text"
+            name="blacklist"
+            placeholder="Поиск для Black list"
+        >
+
+    </section>
+
+
+
+    <section class="white-list">
+
+        <h2>White list ингредиентов</h2>
+
+        <ul>
+
+            <!-- TEMPLATE ингредиент из вайтлиста -->
+            <li>
+                WHITELIST_ITEM
+            </li>
+
+        </ul>
+
+        <!-- TEMPLATE поиск/добавление в вайтлист -->
+        <input
+            type="text"
+            name="whitelist"
+            placeholder="Поиск для White list"
+        >
+
+    </section>
+
+    <button type="submit">
+        Найти рецепты
+    </button>
+
+</section>
+
+</body>
+</html>
