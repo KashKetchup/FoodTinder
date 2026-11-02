@@ -23,6 +23,7 @@
                         out.println("<ui>");
                         for (Recipe recipe : recipes) {
                             out.println("<li>");
+                                out.println("<a href=\"recipe?id=" + recipe.recipeId() + "\">Ссылка</a>");
                                 out.println("<img src=" + recipe.imagePath() + " alt=" + recipe.name() + ">");
                                 out.println("<h2>" + recipe.name() + "</h2>");
                                 out.println("<div class=\"recipe-info\">");

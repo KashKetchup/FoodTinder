@@ -23,7 +23,7 @@
 
 
             <!-- фото блюда -->
-    
+            
             <img
                 src=${recipe.imagePath()}
                 alt="${recipe.name()} - img"

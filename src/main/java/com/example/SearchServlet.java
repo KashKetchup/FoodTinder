@@ -2,14 +2,19 @@ package com.example;
 
 import java.io.IOException;
 
+import java.util.List;
+
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import tinderBack.FTException;
-import tinderBack.Recipe;
+import tinderBack.FoodTag;
+import tinderBack.Ingredient;
 import tomcatIntegration.FTServlet;
 
+@WebServlet(name = "search", urlPatterns = {"/search"})
 public class SearchServlet extends FTServlet {
     @Override 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
@@ -18,13 +23,14 @@ public class SearchServlet extends FTServlet {
         
 
         try {
-            Integer id = Integer.parseInt(req.getParameter("id")); 
-            Recipe recipe = foodTinder.getRecipe(id);
+            List<FoodTag> tags = (List<FoodTag>)foodTinder.getAllTags();
+            List<Ingredient> ingr = (List<Ingredient>)foodTinder.getAllIngredients(); 
 
-            req.setAttribute("recipe", recipe);
+            req.setAttribute("tags", tags);
+            req.setAttribute("ingr", ingr);
 
             RequestDispatcher dispatcher = 
-                req.getRequestDispatcher("WEB-INF/views/recipePage.jsp");
+                req.getRequestDispatcher("WEB-INF/views/searchPage.jsp");
             dispatcher.forward(req, resp);
 
         } catch (NumberFormatException | FTException e) {
