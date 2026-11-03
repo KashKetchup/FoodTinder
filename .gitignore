@@ -7,9 +7,9 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
 *.local
 
 # Editor directories and files
@@ -22,10 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
 .settings/
 
 # Compiled class file
-*.class
+backend/*.class
 
 # Log file
 *.log
@@ -53,11 +54,11 @@ hs_err_pid*
 *.iml
 
 # Maven
-target/
+backend/target/
 
 # Eclipse m2e generated files
 # Eclipse Core
 .project
 # JDT-specific (Eclipse Java Development Tools)
-.classpath
-/bin/
+backend/.classpath
+backend/bin/
