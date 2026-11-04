@@ -1,7 +1,5 @@
 package tomcatIntegration;
 
-import java.net.URI;
-
 import database.DatabaseService;
 import jakarta.servlet.ServletContext;
 import tinderBack.FoodTinder;
@@ -12,10 +10,10 @@ public class TomcatIntegration {
         DatabaseService result = (DatabaseService)ctx.getAttribute("database.DatabaseService");
         if (result == null) {
             try {
-                URI uri = new URI(System.getenv("DB_URI"));
+            	String url = System.getenv("DB_URL");
                 String user = System.getenv("DB_USER");
                 String pass = System.getenv("DB_PASS");
-                result = new DatabaseService(uri, user, pass);
+                result = new DatabaseService(url, user, pass);
             } catch (Exception e) {
                 throw new TomcatIntegrationException();
             }

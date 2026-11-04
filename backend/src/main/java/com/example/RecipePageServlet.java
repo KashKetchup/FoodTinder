@@ -19,9 +19,9 @@ public class RecipePageServlet extends FTServlet{
 
         //Настройка для работы с React
 
-        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-        resp.setHeader("Access-Control-Allow-Methods", "GET, POST");
-        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+//        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+//        resp.setHeader("Access-Control-Allow-Methods", "GET, POST");
+//        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
@@ -31,7 +31,7 @@ public class RecipePageServlet extends FTServlet{
         PrintWriter out = resp.getWriter();
 
         try {
-            Integer id = Integer.parseInt(req.getParameter("id")); 
+            Integer id = Integer.parseInt(req.getParameter("id"));
             Recipe recipe = foodTinder.getRecipe(id);
             String jsonOut = String.format(
                 "{\"id\": \"%d\"" + 

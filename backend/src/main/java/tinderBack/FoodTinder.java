@@ -42,8 +42,8 @@ public class FoodTinder {
             (
                 5, 
                 includedTags, 
-                includedIngr, 
                 excludedTags, 
+                includedIngr, 
                 excludedIngr
             );
         } catch (DBException dbe) {

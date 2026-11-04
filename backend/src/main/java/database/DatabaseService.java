@@ -1,6 +1,5 @@
 package database;
 
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -13,22 +12,20 @@ import javax.sql.rowset.CachedRowSet;
 import javax.sql.rowset.RowSetFactory;
 import javax.sql.rowset.RowSetProvider;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.tomcat.jdbc.pool.DataSource;
+import org.apache.tomcat.jdbc.pool.PoolProperties;
+
 import tinderBack.FoodTag;
 import tinderBack.Ingredient;
 import tinderBack.Recipe;
 
-import java.net.URI;
 import java.sql.Connection;
 
 /**
  * Сервис работы с базой данных
  */
-public class DatabaseService {
-	/**
-	 * Тип целого числа
-	 */
-	private static final String DB_INT = "INTEGER";
-	
+public class DatabaseService {	
 	/**
 	 * Запрос получения рецепта
 	 */
@@ -72,10 +69,10 @@ public class DatabaseService {
 				INNER JOIN recipes_tags rt ON r.id = rt.recipe_id 
 				INNER JOIN recipes_ingredients ri ON r.id = ri.recipe_id 
 			GROUP BY r.id 
-			HAVING SUM(rt.tag_id IN (?)) = ? 
-				AND SUM(rt.tag_id IN (?)) = 0 
-				AND SUM(ri.ingredient_id IN (?)) = ?
-				AND SUM(ri.ingredient_id IN (?)) = 0 
+			HAVING COUNT(DISTINCT IIF(rt.tag_id IN (%s), rt.tag_id, NULL)) = ? 
+				AND COUNT(DISTINCT IIF(rt.tag_id IN (%s), rt.tag_id, NULL)) = 0 
+				AND COUNT(DISTINCT IIF(ri.ingredient_id IN (%s), ri.ingredient_id, NULL)) = ?
+				AND COUNT(DISTINCT IIF(ri.ingredient_id IN (%s), ri.ingredient_id, NULL)) = 0 
 			ORDER BY r.id ASC
 			LIMIT ? OFFSET ?;
 			""";
@@ -135,9 +132,9 @@ public class DatabaseService {
 				,name TEXT NOT NULL
 				,description TEXT
 				,instructions TEXT
-				,calories REAL NOT NULL
-				,difficulty INTEGER NOT NULL
-				,cooking_time INTEGER NOT NULL
+				,calories REAL NOT NULL DEFAULT 0.0
+				,difficulty INTEGER NOT NULL DEFAULT 0
+				,cooking_time INTEGER NOT NULL DEFAULT 0
 				,rating INTEGER NOT NULL DEFAULT 3
 				,PRIMARY KEY(id AUTOINCREMENT)
 			);
@@ -153,8 +150,8 @@ public class DatabaseService {
 				,recipe_id INTEGER NOT NULL
 				,tag_id INTEGER NOT NULL
 				,PRIMARY KEY(id AUTOINCREMENT)
-				,CONSTRAINT fk_recipe_id FOREIGN KEY(recipe_id) REFERENCES recipes(id)
-				,CONSTRAINT fk_tag_id FOREIGN KEY(tag_id) REFERENCES tags(id)
+				,CONSTRAINT fk_rt_recipes FOREIGN KEY(recipe_id) REFERENCES recipes(id)
+				,CONSTRAINT fk_rt_tags FOREIGN KEY(tag_id) REFERENCES tags(id)
 			);
 			""";
 	
@@ -169,8 +166,8 @@ public class DatabaseService {
 				,ingredient_id INTEGER NOT NULL
 				,amount INTEGER NOT NULL
 				,PRIMARY KEY(id AUTOINCREMENT)
-				,CONSTRAINT fk_ingredient_id FOREIGN KEY(ingredient_id) REFERENCES ingredients(id)
-				,CONSTRAINT fk_recipe_id FOREIGN KEY(recipe_id) REFERENCES recipes(id)
+				,CONSTRAINT fk_ri_ingredients FOREIGN KEY(ingredient_id) REFERENCES ingredients(id)
+				,CONSTRAINT fk_ri_recipes FOREIGN KEY(recipe_id) REFERENCES recipes(id)
 			);
 			""";
 	
@@ -192,29 +189,14 @@ public class DatabaseService {
 			+ QUERY_CREATE_RECIPES_INGREDIENTS;
 	
 	/**
-	 * Адрес базы данных
+	 * Пул соединений с базой данных
 	 */
-	private final URI m_dbUri;
-	
-	/**
-	 * Имя пользователя
-	 */
-	private final String m_user;
-	
-	/**
-	 * Пароль пользователя
-	 */
-	private final String m_pword;
-	
-	/**
-	 * Соединение с базой данных
-	 */
-	private volatile Connection m_dbConnection;
+	private final DataSource m_dataSource;
 	
 	/**
 	 * Фабрика для создания RowSet
 	 */
-	private final RowSetFactory factory;
+	private final RowSetFactory m_factory;
 	
 	/**
 	 * Создать сервис работы с базой данных
@@ -224,59 +206,18 @@ public class DatabaseService {
 	 * @throws DBException если не удалось создать фабрику для RowSet
 	 * @see RowSetProvider
 	 */
-	public DatabaseService(URI databaseUri, String user, String password) throws DBException {
-		m_dbUri = databaseUri;
-		m_user = user;
-		m_pword = password;
-		m_dbConnection = null;
+	public DatabaseService(String databaseUrl, String user, String password) throws DBException {
+		PoolProperties p = new PoolProperties();
+		p.setUrl("jdbc:sqlite:" + databaseUrl);
+		p.setDriverClassName("org.sqlite.JDBC");
+		p.setUsername(user);
+		p.setPassword(password);
+		m_dataSource = new DataSource();
+		m_dataSource.setPoolProperties(p);
 		try {
-			factory = RowSetProvider.newFactory();
+			m_factory = RowSetProvider.newFactory();
 		} catch (SQLException e) {
 			throw new DBException("Couldn't create RowSetFactory: " + e.getMessage());
-		}
-	}
-	
-	/**
-	 * Подключиться к базе данных
-	 * @param resetDatabase нужно ли очистить базу данных при подключении
-	 * @throws DBException если не удалось подключиться к базе данных
-	 */
-	public void openConnection(boolean resetDatabase) throws DBException {
-		try {
-			if (m_dbConnection == null) {
-				synchronized (m_dbConnection) {
-					if (m_dbConnection == null) {
-						m_dbConnection = DriverManager.getConnection("jdbc:sqlite:" + m_dbUri, m_user, m_pword);
-					}
-				}
-			} else {
-				throw new DBException("Connection already exists");
-			}			
-		} catch (SQLException e) {
-			throw new DBException("Cannot connect to database: " + e.getMessage());
-		}
-		if (resetDatabase) {
-			resetDatabase();
-		}
-	}
-	
-	/**
-	 * Закрыть соединение с базой данных
-	 * @throws DBException если произошла ошибка при отключении
-	 */
-	public void closeConnection() throws DBException {
-		try {
-			if (m_dbConnection != null) {
-				synchronized (m_dbConnection) {
-					if (m_dbConnection != null) {
-						m_dbConnection.close();
-					}
-				}
-			} else {
-				throw new DBException("Connection already closed");
-			}			
-		} catch (SQLException e) {
-			throw new DBException("Cannot connect to database: " + e.getMessage());
 		}
 	}
 	
@@ -305,6 +246,7 @@ public class DatabaseService {
 						res.getInt("difficulty"));
 			}
 		} catch (SQLException e) {
+			System.out.println(e.getMessage());
 			throw new DBException("Error during data reading: " + e.getMessage());
 		}
 		return null;
@@ -453,23 +395,18 @@ public class DatabaseService {
 	 * @throws DBException если произошла ошибка при сбросе
 	 */
 	private void resetDatabase() throws DBException {
-		synchronized (m_dbConnection) {
-			if (m_dbConnection != null) {
-				try (Statement stmt = m_dbConnection.createStatement()) {
-					try {
-						m_dbConnection.setAutoCommit(false);
-						stmt.execute(QUERY_RESET_DB);
-						m_dbConnection.commit();
-					} finally {
-						m_dbConnection.rollback();
-						m_dbConnection.setAutoCommit(true);
-					}
-				} catch (SQLException e) {
-					throw new DBException("Couldn't reset database: " + e.getMessage());
-				}
-			} else {
-				throw new DBException("Connection is closed");
+		try (Connection conn = m_dataSource.getConnection();
+				Statement stmt = conn.createStatement()) {
+			try {
+				conn.setAutoCommit(false);
+				stmt.execute(QUERY_RESET_DB);
+				conn.commit();
+			} finally {
+				conn.rollback();
+				conn.setAutoCommit(true);
 			}
+		} catch (SQLException e) {
+			throw new DBException("Couldn't reset database: " + e.getMessage());
 		}
 	}
 	
@@ -477,19 +414,14 @@ public class DatabaseService {
 	 * Получить рецепт из базы данных
 	 */
 	private CachedRowSet queryRecFromDB(int recipeId) throws DBException {
-		synchronized (m_dbConnection) {
-			if (m_dbConnection != null) {
-				try (PreparedStatement stmt = m_dbConnection.prepareStatement(QUERY_GET_RECIPE)) {
-					stmt.setInt(1, recipeId);
-					CachedRowSet res = factory.createCachedRowSet();
-					res.populate(stmt.executeQuery());
-					return res;
-				} catch (SQLException e) {
-					throw new DBException("Couldn't get recipe: " + e.getMessage());
-				}
-			} else {
-				throw new DBException("Connection is closed");
-			}
+		try (Connection conn = m_dataSource.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(QUERY_GET_RECIPE)) {
+			stmt.setInt(1, recipeId);
+			CachedRowSet res = m_factory.createCachedRowSet();
+			res.populate(stmt.executeQuery());
+			return res;
+		} catch (SQLException e) {
+			throw new DBException("Couldn't get recipe: " + e.getMessage());
 		}
 	}
 	
@@ -497,19 +429,14 @@ public class DatabaseService {
 	 * Получить ингредиенты рецепта из базы данных
 	 */
 	private CachedRowSet queryIngsFromDBByRec(int recipeId) throws DBException {
-		synchronized (m_dbConnection) {
-			if (m_dbConnection != null) {
-				try (PreparedStatement stmt = m_dbConnection.prepareStatement(QUERY_GET_RECIPE_INGREDIENTS)) {
-					stmt.setInt(1, recipeId);
-					CachedRowSet res = factory.createCachedRowSet();
-					res.populate(stmt.executeQuery());
-					return res;
-				} catch (SQLException e) {
-					throw new DBException("Couldn't get ingredients: " + e.getMessage());
-				}
-			} else {
-				throw new DBException("Connection is closed");
-			}
+		try (Connection conn = m_dataSource.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(QUERY_GET_RECIPE_INGREDIENTS)) {
+			stmt.setInt(1, recipeId);
+			CachedRowSet res = m_factory.createCachedRowSet();
+			res.populate(stmt.executeQuery());
+			return res;
+		} catch (SQLException e) {
+			throw new DBException("Couldn't get ingredients: " + e.getMessage());
 		}
 	}
 	
@@ -517,19 +444,14 @@ public class DatabaseService {
 	 * Получить теги рецепта из базы данных
 	 */
 	private CachedRowSet queryTagsFromDBByRec(int recipeId) throws DBException {
-		synchronized (m_dbConnection) {
-			if (m_dbConnection != null) {
-				try (PreparedStatement stmt = m_dbConnection.prepareStatement(QUERY_GET_RECIPE_TAGS)) {
-					stmt.setInt(1, recipeId);
-					CachedRowSet res = factory.createCachedRowSet();
-					res.populate(stmt.executeQuery());
-					return res;
-				} catch (SQLException e) {
-					throw new DBException("Couldn't get ingredients: " + e.getMessage());
-				}
-			} else {
-				throw new DBException("Connection is closed");
-			}
+		try (Connection conn = m_dataSource.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(QUERY_GET_RECIPE_TAGS)) {
+			stmt.setInt(1, recipeId);
+			CachedRowSet res = m_factory.createCachedRowSet();
+			res.populate(stmt.executeQuery());
+			return res;
+		} catch (SQLException e) {
+			throw new DBException("Couldn't get ingredients: " + e.getMessage());
 		}
 	}
 	
@@ -539,45 +461,59 @@ public class DatabaseService {
 	private CachedRowSet queryRecsFromDBUndConds(int count, int offset,
 			Set<Integer> tagsInc, Set<Integer> tagsExc,
 			Set<Integer> ingsInc, Set<Integer> ingsExc) throws DBException {
-		synchronized (m_dbConnection) {
-			if (m_dbConnection != null) {
-				try (PreparedStatement stmt = m_dbConnection.prepareStatement(QUERY_GET_RECIPES_UNDER_CONDITIONS)) {
-					stmt.setArray(1, m_dbConnection.createArrayOf(DB_INT, tagsInc.toArray()));
-					stmt.setInt(2, tagsInc.size());
-					stmt.setArray(3, m_dbConnection.createArrayOf(DB_INT, tagsExc.toArray()));
-					stmt.setArray(4, m_dbConnection.createArrayOf(DB_INT, ingsInc.toArray()));
-					stmt.setInt(5, ingsInc.size());
-					stmt.setArray(6, m_dbConnection.createArrayOf(DB_INT, ingsExc.toArray()));
-					stmt.setInt(7, count);
-					stmt.setInt(8, offset);
-					CachedRowSet res = factory.createCachedRowSet();
-					res.populate(stmt.executeQuery());
-					return res;
-				} catch (SQLException e) {
-					throw new DBException("Couldn't get recipes: " + e.getMessage());
-				}
-			} else {
-				throw new DBException("Connection is closed");
-			}
+		String queryString = QUERY_GET_RECIPES_UNDER_CONDITIONS.formatted(
+				StringUtils.repeat("?", ", ", tagsInc.size()), 
+				StringUtils.repeat("?", ", ", tagsExc.size()), 
+				StringUtils.repeat("?", ", ", ingsInc.size()), 
+				StringUtils.repeat("?", ", ", ingsExc.size()));
+		try (Connection conn = m_dataSource.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(queryString)) {
+			return prepRecStmt(count, offset, tagsInc, tagsExc, ingsInc, ingsExc, stmt);
+		} catch (SQLException e) {
+			throw new DBException("Couldn't get recipes: " + e.getMessage());
 		}
+	}
+	
+	/**
+	 * Выполнить запрос с предварительной вставкой данных и вернуть результат
+	 */
+	private CachedRowSet prepRecStmt(int count, int offset,
+			Set<Integer> tagsInc, Set<Integer> tagsExc,
+			Set<Integer> ingsInc, Set<Integer> ingsExc,
+			PreparedStatement stmt) throws SQLException {
+		int index = 1;
+		for (int number : tagsInc) {
+			stmt.setInt(index++, number);
+		}
+		stmt.setInt(index++, tagsInc.size());
+		for (int number : tagsExc) {
+			stmt.setInt(index++, number);
+		}
+		for (int number : ingsInc) {
+			stmt.setInt(index++, number);
+		};
+		stmt.setInt(index++, ingsInc.size());
+		for (int number : ingsExc) {
+			stmt.setInt(index++, number);
+		}
+		stmt.setInt(index++, count);
+		stmt.setInt(index, offset);
+		CachedRowSet res = m_factory.createCachedRowSet();
+		res.populate(stmt.executeQuery());
+		return res;
 	}
 	
 	/**
 	 * Получить все ингредиенты из базы данных
 	 */
 	private CachedRowSet queryAllIngsFromDB() throws DBException {
-		synchronized (m_dbConnection) {
-			if (m_dbConnection != null) {
-				try (PreparedStatement stmt = m_dbConnection.prepareStatement(QUERY_GET_ALL_INGREDIENTS)) {
-					CachedRowSet res = factory.createCachedRowSet();
-					res.populate(stmt.executeQuery());
-					return res;
-				} catch (SQLException e) {
-					throw new DBException("Couldn't get recipe: " + e.getMessage());
-				}
-			} else {
-				throw new DBException("Connection is closed");
-			}
+		try (Connection conn = m_dataSource.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(QUERY_GET_ALL_INGREDIENTS)) {
+			CachedRowSet res = m_factory.createCachedRowSet();
+			res.populate(stmt.executeQuery());
+			return res;
+		} catch (SQLException e) {
+			throw new DBException("Couldn't get recipe: " + e.getMessage());
 		}
 	}
 	
@@ -585,18 +521,13 @@ public class DatabaseService {
 	 * Получить все теги из базы данных
 	 */
 	private CachedRowSet queryAllTagsFromDB() throws DBException {
-		synchronized (m_dbConnection) {
-			if (m_dbConnection != null) {
-				try (PreparedStatement stmt = m_dbConnection.prepareStatement(QUERY_GET_ALL_TAGS)) {
-					CachedRowSet res = factory.createCachedRowSet();
-					res.populate(stmt.executeQuery());
-					return res;
-				} catch (SQLException e) {
-					throw new DBException("Couldn't get recipe: " + e.getMessage());
-				}
-			} else {
-				throw new DBException("Connection is closed");
-			}
+		try (Connection conn = m_dataSource.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(QUERY_GET_ALL_TAGS)) {
+			CachedRowSet res = m_factory.createCachedRowSet();
+			res.populate(stmt.executeQuery());
+			return res;
+		} catch (SQLException e) {
+			throw new DBException("Couldn't get recipe: " + e.getMessage());
 		}
 	}
 }

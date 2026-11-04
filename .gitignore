@@ -7,9 +7,10 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-frontend/node_modules/
-frontend/dist/
-frontend/dist-ssr/
+**/node/
+**/node_modules/
+**/dist/
+**/dist-ssr/
 *.local
 
 # Editor directories and files
@@ -26,7 +27,7 @@ frontend/dist-ssr/
 .settings/
 
 # Compiled class file
-backend/*.class
+*.class
 
 # Log file
 *.log
@@ -54,11 +55,16 @@ hs_err_pid*
 *.iml
 
 # Maven
-backend/target/
+**/target/
 
 # Eclipse m2e generated files
 # Eclipse Core
 .project
 # JDT-specific (Eclipse Java Development Tools)
-backend/.classpath
-backend/bin/
+.classpath
+bin/
+
+backend/src/main/webapp/assets/
+backend/src/main/webapp/index.html
+backend/src/main/webapp/favicon.svg
+backend/src/main/webapp/icons.svg

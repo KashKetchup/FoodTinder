@@ -5,6 +5,11 @@ import tinderBack.Recipe;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 
 import java.io.IOException;
@@ -23,9 +28,9 @@ public class RecipeServlet extends FTServlet{
 
         //Настройка для работы с React
 
-        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-        resp.setHeader("Access-Control-Allow-Methods", "GET, POST");
-        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+//        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+//        resp.setHeader("Access-Control-Allow-Methods", "GET, POST");
+//        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
@@ -43,9 +48,13 @@ public class RecipeServlet extends FTServlet{
 
             List<Recipe> recipes = foodTinder.findRecomendRecipes(includeTag, excludeTag,
                 includeIngredient, excludeIngredient);
-
-            for (Recipe recipe : recipes) {
-                String jsonOut = String.format(
+            /*
+             * Преобразование рецептов в массив объектов JSON
+             * Реализуется как StringUtils.join('[', str, ']'), где
+             * str формируется из recipes с помощью Stream API с разделителями ", "
+             */
+            out.print(StringUtils.join('[', 
+				recipes.stream().map(recipe -> String.format(
                     "{\"id\": \"%d\"" + 
                     ", \"title\": \"%s\"" + 
                     ", \"description\": \"%s\"" + 
@@ -58,13 +67,9 @@ public class RecipeServlet extends FTServlet{
                     recipe.recipeId(), recipe.name(), recipe.description(),
                     recipe.instruction(), recipe.imagePath(),
                     recipe.cookingTime(), recipe.rate(), 
-                    recipe.calories(), recipe.difficulty()
-                );
-
-                out.print(jsonOut);
-                //Либо собрать в массив и отправить разом
-            }
-
+                    recipe.calories(), recipe.difficulty()))
+				.collect(Collectors.joining(", ")), ']'));
+            out.flush();
         } catch (NumberFormatException | FTException e) {
             //TODO Подумать над реализацией исключений
         }
@@ -72,7 +77,6 @@ public class RecipeServlet extends FTServlet{
     }
 
     private static Set<Integer> parseNumbers(String argumentValue) {
-
         Set<Integer> result = new HashSet<>();
         try {
             if (argumentValue != null) {

@@ -7,21 +7,6 @@
     <request-character-encoding>UTF-8</request-character-encoding>
     <response-character-encoding>UTF-8</response-character-encoding>
 
-    <welcome-file-list>
-        <welcome-file>index.html</welcome-file>
-    </welcome-file-list>
-
-    <servlet>
-        <servlet-name>test</servlet-name>
-        <servlet-class>com.example.TestServlet</servlet-class>
-    </servlet>
-
-    <servlet-mapping>
-        <servlet-name>test</servlet-name>
-        <url-pattern>/test</url-pattern>
-    </servlet-mapping>
-
-
     <servlet>
         <servlet-name>recipePage</servlet-name>
         <servlet-class>com.example.RecipePageServlet</servlet-class>
@@ -29,6 +14,16 @@
 
     <servlet-mapping>
         <servlet-name>recipePage</servlet-name>
-        <url-pattern>/recipe</url-pattern>
+        <url-pattern>/backend/recipe</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>recipe</servlet-name>
+        <servlet-class>com.example.RecipeServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>recipe</servlet-name>
+        <url-pattern>/backend/main</url-pattern>
     </servlet-mapping>
 </web-app>

@@ -5,7 +5,7 @@ import './RecipeDetailScreen.css';
 // ИНТЕРФЕЙС
 interface Recipe {
   id: number;
-  name: string;
+  title: string;
   description: string;
   instruction: string;
   ingredients: Object;
@@ -58,7 +58,7 @@ export default function RecipeDetailScreen() {
       <div className="container">
         <h2>Рецепт не найден</h2>
         <button className="back-button" onClick={() => navigate(-1)}>
-          ← Назад к списку
+          ← Назад
         </button>
       </div>
     );
@@ -68,11 +68,11 @@ export default function RecipeDetailScreen() {
   return (
     <div className="container recipe-detail">
       <button className="back-button" onClick={() => navigate(-1)}>
-        ← Назад к списку
+        ← Назад
       </button>
       
-      <img src={recipe.image_url} alt={recipe.name} className="detail-image" />
-      <h1 className="detail-title">{recipe.name}</h1>
+      <img src={recipe.image_url} alt={recipe.title} className="detail-image" />
+      <h1 className="detail-title">{recipe.title}</h1>
       <p className="detail-description">{recipe.description}</p>
     </div>
   );

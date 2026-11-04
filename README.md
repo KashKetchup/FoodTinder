@@ -1,16 +1,21 @@
-# React + Vite
+# Полезная информация
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Как это собирать и запускать
 
-Currently, two official plugins are available:
+1. Установите Maven по инструкциям для вашей системы на странице https://maven.apache.org/install.html
+2. Установите JDK не ниже 25 версии по инструкциям для вашей системы на странице https://metanit.com/java/tutorial/1.6.php
+3. Установите Tomcat не ниже 11 по инструкциям для
+ - Linux: https://firstvds.ru/technology/apache-tomcat 
+ - Windows: https://javarush.com/quests/lectures/questservlets.level11.lecture01
+4. Клонируйте этот репозиторий
+5. Перейдите в директорию FoodTinder и выполните команду `mvn clean package`
+6. Скопируйте файл ROOT.war из директории backend/target в директорию webapps, находящуюся в директории, куда вы устанавливали Tomcat, то есть TomcatXX/webapps. Удалите созданную автоматически директорию ROOT
+7. Добавьте в переменные среды (ищите способ для вашей системы) следующие значения:
+ - DB_URL - путь до базы данных
+ - DB_USER - имя пользователя базы данных (опционально)
+ - DB_PASS - пароль для пользователя базы данных (опционально)
+8. Запустите Tomcat и перейдите в браузере по адресу localhost:port, если запускаете на локальной машине, иначе укажите ip или домен сервера, на котором запускаете Tomcat
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Особенности сборщика
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+При запуске `mvn clean package` фронтенд часть на React автоматически компилируется и копируется в ресурсы бэкенд части. Из-за этого первый запуск может длиться дольше, так как устанавливаются Node.js и сборщик Vite

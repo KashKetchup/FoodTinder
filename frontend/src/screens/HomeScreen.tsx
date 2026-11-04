@@ -5,7 +5,7 @@ import './HomeScreen.css';
 // ИНТЕРФЕЙС
 interface Recipe {
   id: number;
-  name: string;
+  title: string;
   description: string;
   instruction: string;
   ingredients: Object;
@@ -22,7 +22,11 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
 
   const fetchRecipes = async () => {
-    return fetch(`/backend/main`)
+    const params = new URLSearchParams(window.location.search);
+    return fetch(`/backend/main?in_ingr=${params.get("include_ingredients") || "null"}` +
+                              `&ex_ingr=${params.get("exclude_ingredients") || "null"}` + 
+                              `&in_tag=${params.get("include_tags") || "null"}` + 
+                              `&ex_tag=${params.get("exclude_tags") || "null"}`)
         .then((response) => {
           setLoading(false);
           return response.json();
@@ -87,11 +91,11 @@ export default function HomeScreen() {
           >
             <img
               src={recipe.image_url}
-              alt={recipe.name}
+              alt={recipe.title}
               className="recipe-image"
             />
             <div className="recipe-info">
-              <h2 className="recipe-title">{recipe.name}</h2>
+              <h2 className="recipe-title">{recipe.title}</h2>
               <p className="recipe-description">{recipe.description}</p>
             </div>
           </div>
