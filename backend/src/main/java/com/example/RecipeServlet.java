@@ -6,7 +6,6 @@ import tinderBack.Recipe;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,7 +14,6 @@ import java.util.List;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -72,7 +70,8 @@ public class RecipeServlet extends FTServlet{
 				.collect(Collectors.joining(", ")), ']'));
             out.flush();
         } catch (NumberFormatException | FTException e) {
-            //TODO Подумать над реализацией исключений
+            out.println("");
+            System.out.println(e.getMessage());
         }
         
     }
@@ -85,7 +84,10 @@ public class RecipeServlet extends FTServlet{
                     result.add(Integer.parseInt(strNumber));
                 }
             }
-        } catch (NumberFormatException nfe) {} // Хотим просто вернуть, что было
+        } catch (NumberFormatException nfe) {
+            System.out.println("Некорректный id ингредиента "
+            + "или тега в аргументах поисковой строки");
+        } // Хотим просто вернуть, что было
 
         return result;
     }

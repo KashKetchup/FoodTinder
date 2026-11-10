@@ -6,10 +6,10 @@ import tinderBack.Recipe;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import tomcatIntegration.*;
 
 public class RecipePageServlet extends FTServlet{
@@ -35,14 +35,26 @@ public class RecipePageServlet extends FTServlet{
             Integer id = Integer.parseInt(req.getParameter("id"));
             Recipe recipe = foodTinder.getRecipe(id);
 
-            req.setAttribute("recipe", recipe);
-
-            RequestDispatcher dispatcher = 
-                req.getRequestDispatcher("WEB-INF/views/recipePage.jsp");
-            dispatcher.forward(req, resp);
+            out.println(String.format(
+                "{\"id\": \"%d\"" + 
+                ", \"title\": \"%s\"" + 
+                ", \"description\": \"%s\"" + 
+                ", \"instruction\": \"%s\"" +
+                ", \"image_url\": \"%s\"" +
+                ", \"cookingTime\": \"%d\"" +
+                ", \"rate\": \"%d\"" +
+                ", \"calories\": \"%f\"" +
+                ", \"difficulty\": \"%d\"}",
+                recipe.recipeId(), recipe.name(), recipe.description(),
+                recipe.instruction(), recipe.imagePath(),
+                recipe.cookingTime(), recipe.rate(), 
+                recipe.calories(), recipe.difficulty()
+            ));
+            out.flush();
 
         } catch (NumberFormatException | FTException e) {
-            //TODO Подумать над реализацией исключений
+            out.println("");
+            System.out.println(e.getMessage());
         }
         
         

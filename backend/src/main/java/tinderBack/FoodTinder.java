@@ -1,7 +1,6 @@
 package tinderBack;
 
 import java.util.Set;
-import java.util.HashSet;
 import java.util.List;
 import database.*;
 
@@ -28,11 +27,11 @@ public class FoodTinder {
         try {
             return m_dbService.getAllTags();
         } catch (DBException dbe) {
-            throw new FTException("DB err");
+            throw new FTException(dbe.getMessage());
         }
     }
 
-    //TEST EXAMPLE
+
 
     public List<Recipe> findRecomendRecipes (
         Set<Integer> includedTags, 
@@ -54,23 +53,13 @@ public class FoodTinder {
         }  
     }
 
-    //TEST EXAMPLE
 
     public Recipe getRecipe(int id) throws FTException {
         try {
-            if (id == 1) {
-                Set<Ingredient> ingr = new HashSet<>();
-                Set<FoodTag> tags = new HashSet<>();
-                return new Recipe(1, "Plov", "Plov - plov", "Do some thing", ingr, tags, "./home/al6ed0/Изображения/Emote_60000398.png", 1000, 1, 10.2, 100);
-            } 
-            if (id == 2) {
-                Set<Ingredient> ingr = new HashSet<>();
-                Set<FoodTag> tags = new HashSet<>();
-                return new Recipe(2, "Oleg", "Oleg - Olga", "Do some thing", ingr, tags, "./home/al6ed0/Изображения/Emote_60000398.png", 1000, 1, 10.2, 100);
-            } 
-            return null;
+            return m_dbService.getRecipe(id);
+
             //DBException
-        } catch (Exception dbe) {
+        } catch (DBException dbe) {
             throw new FTException(dbe.getMessage());
         }
     }

@@ -26,4 +26,15 @@
         <servlet-name>recipe</servlet-name>
         <url-pattern>/backend/main</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>search</servlet-name>
+        <servlet-class>com.example.SearchServlet</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>search</servlet-name>
+        <url-pattern>/backend/search</url-pattern>
+    </servlet-mapping>
+
 </web-app>

@@ -26,11 +26,10 @@ public class TomcatIntegration {
     public static FoodTinder getFoodTinder(ServletContext ctx) throws TomcatIntegrationException, ServletException {
         FoodTinder result = (FoodTinder)ctx.getAttribute("tinderBack.FoodTinder");
         if (result == null) {
-            //DatabaseService dbs = getDataBase(ctx);
-            result = new FoodTinder(null);
+            DatabaseService dbs = getDataBase(ctx);
+            result = new FoodTinder(dbs);
             ctx.setAttribute("tinderBack.FoodTinder", result);
         }
-        
         return result;
     }
 }
