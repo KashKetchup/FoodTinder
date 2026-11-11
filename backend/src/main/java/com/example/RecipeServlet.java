@@ -79,14 +79,14 @@ public class RecipeServlet extends FTServlet{
     private static Set<Integer> parseNumbers(String argumentValue) {
         Set<Integer> result = new HashSet<>();
         try {
-            if (argumentValue != null) {
+            if (argumentValue != null && !argumentValue.equals("null")) {
+                
                 for(String strNumber : argumentValue.split(",")) {
                     result.add(Integer.parseInt(strNumber));
                 }
             }
         } catch (NumberFormatException nfe) {
-            System.out.println("Некорректный id ингредиента "
-            + "или тега в аргументах поисковой строки");
+            System.out.println("NumberFormatException: " + nfe.getMessage());
         } // Хотим просто вернуть, что было
 
         return result;
