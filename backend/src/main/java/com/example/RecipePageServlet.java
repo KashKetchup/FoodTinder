@@ -20,10 +20,6 @@ public class RecipePageServlet extends FTServlet{
 
         //Настройка для работы с React
 
-//        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-//        resp.setHeader("Access-Control-Allow-Methods", "GET, POST");
-//        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
@@ -52,9 +48,10 @@ public class RecipePageServlet extends FTServlet{
             ));
             out.flush();
 
-        } catch (NumberFormatException | FTException e) {
-            out.println("");
-            System.out.println(e.getMessage());
+        } catch (FTException e) {
+            System.out.println("\nError while accessing to FoodTinder:\n" + e.getMessage());
+        } catch (NumberFormatException nfe) {
+            System.out.println("\nUnable to determine ID:\n" + nfe.getMessage());
         }
         
         
@@ -72,23 +69,3 @@ public class RecipePageServlet extends FTServlet{
 
         // resp.setContentType("application/json");
         // resp.setCharacterEncoding("UTF-8");
-
-        // //Отправляем запрос к БД и парсим ответ, затем отправляем на React
-
-        // PrintWriter out = resp.getWriter();
-        // String jsonOut = String.format(
-        //         "{\"id\": \"%d\"" + 
-        //         ", \"title\": \"%s\"" + 
-        //         ", \"description\": \"%s\"" + 
-        //         ", \"instruction\": \"%s\"" +
-        //         ", \"image_url\": \"%s\"" +
-        //         ", \"cookingTime\": \"%d\"" +
-        //         ", \"rate\": \"%d\"" +
-        //         ", \"calories\": \"%f\"" +
-        //         ", \"difficulty\": \"%d\"}",
-        //         recipe.recipeId(), recipe.name(), recipe.description(),
-        //         recipe.instruction(), recipe.imagePath(),
-        //         recipe.cookingTime(), recipe.rate(), 
-        //         recipe.calories(), recipe.difficulty()
-                
-        //     );

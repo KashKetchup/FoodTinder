@@ -27,10 +27,6 @@ public class RecipeServlet extends FTServlet{
 
         //Настройка для работы с React
 
-//        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-//        resp.setHeader("Access-Control-Allow-Methods", "GET, POST");
-//        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
@@ -69,9 +65,10 @@ public class RecipeServlet extends FTServlet{
                     recipe.calories(), recipe.difficulty()))
 				.collect(Collectors.joining(", ")), ']'));
             out.flush();
-        } catch (NumberFormatException | FTException e) {
-            out.println("");
-            System.out.println(e.getMessage());
+        } catch (FTException e) {
+            System.out.println("\nError while accessing to FoodTinder:\n" + e.getMessage());
+        } catch (NumberFormatException nfe) {
+            System.out.println("\nUnable to determine ID:\n" + nfe.getMessage());
         }
         
     }
@@ -86,7 +83,7 @@ public class RecipeServlet extends FTServlet{
                 }
             }
         } catch (NumberFormatException nfe) {
-            System.out.println("NumberFormatException: " + nfe.getMessage());
+            System.out.println("\nUnable to determine ID:\n" + nfe.getMessage());
         } // Хотим просто вернуть, что было
 
         return result;

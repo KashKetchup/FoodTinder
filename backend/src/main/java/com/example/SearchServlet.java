@@ -35,27 +35,28 @@ public class SearchServlet extends FTServlet {
             List<FoodTag> tags = (List<FoodTag>)foodTinder.getAllTags();
             List<Ingredient> ingr = (List<Ingredient>)foodTinder.getAllIngredients(); 
 
-            String strTagList = "tags: " + StringUtils.join('[', 
+            String strTagList = "\"tags\": " + StringUtils.join('[', 
 				tags.stream().map(tag -> String.format(
                     "{\"id\": \"%d\"" + 
                     ", \"tag_name\": \"%s\"}",
                     tag.id(), tag.name()))
 				.collect(Collectors.joining(", ")), ']');
 
-            String strIngrList = "ingrediens: " + StringUtils.join('[', 
+            String strIngrList = "\"ingrediens\": " + StringUtils.join('[', 
 				ingr.stream().map(ingredient -> String.format(
                     "{\"id\": \"%d\"" + 
                     ", \"ingr_name\": \"%s\"}",
                     ingredient.id(), ingredient.name()))
 				.collect(Collectors.joining(", ")), ']');
 
-            out.print(strTagList + '\n' + strIngrList);
+            out.print("[{" + strTagList + "}, {" + strIngrList + "}]");
             out.flush();
             
 
-        } catch (NumberFormatException | FTException e) {
-            out.println("");
-            System.out.println(e.getMessage());
+        } catch (FTException e) {
+            System.out.println("\nError while accessing to FoodTinder:\n" + e.getMessage());
+        } catch (NumberFormatException nfe) {
+            System.out.println("\nUnable to determine ID:\n" + nfe.getMessage());
         }
         
         

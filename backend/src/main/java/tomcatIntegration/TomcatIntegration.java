@@ -16,7 +16,7 @@ public class TomcatIntegration {
                 String pass = System.getenv("DB_PASS");
                 result = new DatabaseService(url, user, pass);
             } catch (Exception e) {
-                throw new TomcatIntegrationException();
+                throw new TomcatIntegrationException(e.getMessage());
             }
             ctx.setAttribute("database.DatabaseService", result);
         }
