@@ -50,6 +50,14 @@ public class FoodTinder {
             throw new FTException(dbe.getMessage());
         }  
     }
+    
+    public List<Diet> findRecomendDiets () throws FTException {
+        try {
+            return m_dbService.getAllDiets();
+        } catch (DBException dbe) {
+            throw new FTException(dbe.getMessage());
+        }  
+    }
 
     public Recipe getRecipe(int id) throws FTException {
         try {

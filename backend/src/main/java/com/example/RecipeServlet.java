@@ -71,6 +71,8 @@ public class RecipeServlet extends FTServlet{
 				.collect(Collectors.joining(", ")), ']'));
             out.flush();
         } catch (NumberFormatException | FTException e) {
+        	e.printStackTrace();
+        	System.out.println(e.getMessage());
             //TODO Подумать над реализацией исключений
         }
         

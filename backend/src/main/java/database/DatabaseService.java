@@ -4,8 +4,10 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.sql.rowset.CachedRowSet;
@@ -16,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.jdbc.pool.DataSource;
 import org.apache.tomcat.jdbc.pool.PoolProperties;
 
+import tinderBack.Diet;
 import tinderBack.FoodTag;
 import tinderBack.Ingredient;
 import tinderBack.Recipe;
@@ -31,9 +34,16 @@ public class DatabaseService {
 	 */
 	private static final String QUERY_GET_RECIPE = 
 			"""
-			SELECT * 
-			FROM recipes 
-			WHERE id = ?;
+			SELECT r.*
+				,SUM(i.calories * ri.amount) AS calories
+				,SUM(i.proteins * ri.amount) AS proteins
+				,SUM(i.fats * ri.amount) AS fats
+				,SUM(i.carbs * ri.amount) AS carbs
+			FROM recipes r 
+				JOIN recipes_ingredients ri ON ri.recipe_id = r.id
+				JOIN ingredients i ON i.id = ri.ingredient_id 
+			GROUP BY r.id
+			HAVING r.id = ?;
 			""";
 	
 	/**
@@ -42,9 +52,9 @@ public class DatabaseService {
 	private static final String QUERY_GET_RECIPE_INGREDIENTS = 
 			"""
 			SELECT i.*
-				,ri.amount 
+				,ri.amount AS amount
 			FROM ingredients i 
-				JOIN recipes_ingredients ri ON i.id = ri.ingredient_id 
+				JOIN recipes_ingredients ri ON ri.ingredient_id = i.id 
 			WHERE ri.recipe_id = ?;
 			""";
 	
@@ -55,7 +65,7 @@ public class DatabaseService {
 			"""
 			SELECT t.* 
 			FROM tags t 
-				JOIN recipes_tags rt ON t.id = rt.tag_id 
+				JOIN recipes_tags rt ON rt.tag_id = t.id 
 			WHERE rt.recipe_id = ?;
 			""";
 	
@@ -64,7 +74,11 @@ public class DatabaseService {
 	 */
 	private static final String QUERY_GET_RECIPES_UNDER_CONDITIONS = 
 			"""
-			SELECT r.* 
+			SELECT r.*
+				,SUM(i.calories * ri.amount) AS calories
+				,SUM(i.proteins * ri.amount) AS proteins
+				,SUM(i.fats * ri.amount) AS fats
+				,SUM(i.carbs * ri.amount) AS carbs
 			FROM recipes r 
 				INNER JOIN recipes_tags rt ON r.id = rt.recipe_id 
 				INNER JOIN recipes_ingredients ri ON r.id = ri.recipe_id 
@@ -95,6 +109,48 @@ public class DatabaseService {
 			SELECT * 
 			FROM tags
 			ORDER BY name ASC;
+			""";
+	
+	/**
+	 * Запрос получения всех рационов
+	 */
+	private static final String QUERY_GET_ALL_DIETS = 
+			"""
+			SELECT *
+			FROM diets;
+			""";
+	
+	/**
+	 * Запрос получения рациона по идентификатору
+	 */
+	private static final String QUERY_GET_DIET = 
+			"""
+			SELECT *
+			FROM diets
+			WHERE id = ?;
+			""";
+
+	/**
+	 * Запрос получения всех рецептов рациона
+	 */
+	private static final String QUERY_GET_DIET_RECIPES = 
+			"""
+			SELECT r.*
+				,di.time AS time
+			FROM recipes
+				JOIN diets_recipes di ON di.recipe_id = r.id
+			WHERE di.diet_id = ?;
+			""";
+	
+	/**
+	 * Запрос получения всех рецептов рациона за определённое время
+	 */
+	private static final String QUERY_GET_DIET_RECIPES_FOR_TIME = 
+			"""
+			SELECT r.*
+			FROM recipes
+				JOIN diets_recipes di ON di.recipe_id = r.id
+			WHERE di.diet_id = ? AND time = ?;
 			""";
 	
 	/**
@@ -146,8 +202,7 @@ public class DatabaseService {
 	private final static String QUERY_CREATE_RECIPES_TAGS = 
 			"""
 			CREATE TABLE recipes_tags (
-				id INTEGER NOT NULL UNIQUE
-				,recipe_id INTEGER NOT NULL
+				recipe_id INTEGER NOT NULL
 				,tag_id INTEGER NOT NULL
 				,PRIMARY KEY(id AUTOINCREMENT)
 				,CONSTRAINT fk_rt_recipes FOREIGN KEY(recipe_id) REFERENCES recipes(id)
@@ -161,8 +216,7 @@ public class DatabaseService {
 	private final static String QUERY_CREATE_RECIPES_INGREDIENTS = 
 			"""
 			CREATE TABLE recipes_ingredients (
-				id INTEGER NOT NULL UNIQUE
-				,recipe_id INTEGER NOT NULL
+				recipe_id INTEGER NOT NULL
 				,ingredient_id INTEGER NOT NULL
 				,amount INTEGER NOT NULL
 				,PRIMARY KEY(id AUTOINCREMENT)
@@ -223,7 +277,7 @@ public class DatabaseService {
 	
 	/**
 	 * Получить рецепт по идентификатору
-	 * @param recipe_id идентификатор рецепта
+	 * @param recipeId идентификатор рецепта
 	 * @return экземпляр Recipe, если рецепт есть, иначе null
 	 * @throws DBException если произошла ошибка при работе с базой данных
 	 * @see Recipe
@@ -239,14 +293,16 @@ public class DatabaseService {
 						res.getString("instructions"),
 						getIngredientsByRecipe(recipeId),
 						getTagsByRecipe(recipeId),
-						"image_path", //TODO откуда брать адрес изображения?
+						res.getString("image"),
 						res.getInt("cooking_time"),
 						res.getInt("rating"),
 						res.getDouble("calories"),
+						res.getDouble("proteins"),
+						res.getDouble("fats"),
+						res.getDouble("carbs"),
 						res.getInt("difficulty"));
 			}
 		} catch (SQLException e) {
-			System.out.println(e.getMessage());
 			throw new DBException("Error during data reading: " + e.getMessage());
 		}
 		return null;
@@ -321,10 +377,13 @@ public class DatabaseService {
 						res.getString("instructions"),
 						getIngredientsByRecipe(recipeId),
 						getTagsByRecipe(recipeId),
-						"image_path", //TODO откуда брать адрес изображения?
+						res.getString("image"),
 						res.getInt("cooking_time"),
 						res.getInt("rating"),
 						res.getDouble("calories"),
+						res.getDouble("proteins"),
+						res.getDouble("fats"),
+						res.getDouble("carbs"),
 						res.getInt("difficulty")));
 			}
 			return List.copyOf(recipes);
@@ -390,6 +449,90 @@ public class DatabaseService {
 		}
 	}
 	
+	/**
+	 * Получить рацион по идентификатору
+	 * @param dietId идентификатор рецепта
+	 * @return экземпляр Diet, если рецепт есть, иначе null
+	 * @throws DBException если произошла ошибка при работе с базой данных
+	 * @see Diet
+	 */
+	public Diet getDiet(int dietId) throws DBException {
+		CachedRowSet res = queryDietFromDB(dietId);
+		try {
+			if (res.next()) {
+				return new Diet(res.getInt("id"),
+						res.getString("description"),
+						getDietRecipes(dietId).entrySet().stream()
+							.sorted().map(Map.Entry::getValue).toList());
+			}
+		} catch (SQLException e) {
+			throw new DBException("Error during data reading: " + e.getMessage());
+		}
+		return null;
+	}
+
+	/**
+	 * Получить список всех рационов
+	 * @return неизменяемый список экземпляров Diet, никогда не возвращает null
+	 * @throws DBException если произошла ошибка при работе с базой данных
+	 * @see Diet
+	 */
+	public List<Diet> getAllDiets() throws DBException {
+		CachedRowSet res = queryAllDietsFromDB();
+		try {
+			List<Diet> tags = new ArrayList<Diet>();
+			while (res.next()) {
+				int dietId = res.getInt("id");
+				tags.add(new Diet(dietId, 
+						res.getString("description"),
+						getDietRecipes(dietId).entrySet().stream()
+							.sorted().map(Map.Entry::getValue).toList()));
+			}
+			return List.copyOf(tags);
+		} catch (SQLException e) {
+			throw new DBException("Error during data reading: " + e.getMessage());
+		}
+	}
+
+	/**
+	 * 
+	 * @throws DBException 
+	 * 
+	 */
+	private Map<Integer, List<Recipe>> getDietRecipes(int dietId) throws DBException {
+		CachedRowSet res = queryDietRecipesFromDB(dietId);
+		try {
+			Map<Integer, List<Recipe>> dietRecipes = new HashMap<Integer, List<Recipe>>();
+			List<Recipe> recipes = null;
+			while (res.next()) {
+				int time = res.getInt("time");
+				if (dietRecipes.get(time) == null) {
+					dietRecipes.put(time, new ArrayList<Recipe>());
+				}
+				recipes = dietRecipes.get(res.getInt("time"));
+				int recipeId = res.getInt("id");
+				recipes.add(new Recipe(
+						recipeId,
+						res.getString("name"),
+						res.getString("description"),
+						res.getString("instructions"),
+						getIngredientsByRecipe(recipeId),
+						getTagsByRecipe(recipeId),
+						res.getString("image"),
+						res.getInt("cooking_time"),
+						res.getInt("rating"),
+						res.getDouble("calories"),
+						res.getDouble("proteins"),
+						res.getDouble("fats"),
+						res.getDouble("carbs"),
+						res.getInt("difficulty")));
+			}
+			return dietRecipes;
+		} catch (SQLException e) {
+			throw new DBException("Error during data reading: " + e.getMessage());
+		}
+	}
+
 	/**
 	 * Очистить базу данных
 	 * @throws DBException если произошла ошибка при сбросе
@@ -523,6 +666,57 @@ public class DatabaseService {
 	private CachedRowSet queryAllTagsFromDB() throws DBException {
 		try (Connection conn = m_dataSource.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(QUERY_GET_ALL_TAGS)) {
+			CachedRowSet res = m_factory.createCachedRowSet();
+			res.populate(stmt.executeQuery());
+			return res;
+		} catch (SQLException e) {
+			throw new DBException("Couldn't get recipe: " + e.getMessage());
+		}
+	}
+	
+	/**
+	 * 
+	 * @param dietId
+	 * @throws DBException
+	 * @return 
+	 */
+	private CachedRowSet queryDietFromDB(int dietId) throws DBException {
+		try (Connection conn = m_dataSource.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(QUERY_GET_DIET)) {
+			stmt.setInt(1, dietId);
+			CachedRowSet res = m_factory.createCachedRowSet();
+			res.populate(stmt.executeQuery());
+			return res;
+		} catch (SQLException e) {
+			throw new DBException("Couldn't get recipe: " + e.getMessage());
+		}
+	}
+	
+	/**
+	 * 
+	 * @return
+	 * @throws DBException 
+	 */
+	private CachedRowSet queryAllDietsFromDB() throws DBException {
+		try (Connection conn = m_dataSource.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(QUERY_GET_ALL_DIETS)) {
+			CachedRowSet res = m_factory.createCachedRowSet();
+			res.populate(stmt.executeQuery());
+			return res;
+		} catch (SQLException e) {
+			throw new DBException("Couldn't get recipe: " + e.getMessage());
+		}
+	}
+	
+	/**
+	 * 
+	 * @throws DBException
+	 * @return 
+	 */
+	private CachedRowSet queryDietRecipesFromDB(int dietId) throws DBException {
+		try (Connection conn = m_dataSource.getConnection();
+				PreparedStatement stmt = conn.prepareStatement(QUERY_GET_DIET_RECIPES)) {
+			stmt.setInt(1, dietId);
 			CachedRowSet res = m_factory.createCachedRowSet();
 			res.populate(stmt.executeQuery());
 			return res;

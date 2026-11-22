@@ -11,6 +11,7 @@ public class TomcatIntegration {
         if (result == null) {
             try {
             	String url = System.getenv("DB_URL");
+            	System.out.println("\n\n\n\n" + url + "\n\n\n\n");
                 String user = System.getenv("DB_USER");
                 String pass = System.getenv("DB_PASS");
                 result = new DatabaseService(url, user, pass);
