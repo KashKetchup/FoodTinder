@@ -49,14 +49,18 @@ public class SearchServlet extends FTServlet {
                     ingredient.id(), ingredient.name()))
 				.collect(Collectors.joining(", ")), ']');
 
-            out.print("[{" + strTagList + "}, {" + strIngrList + "}]");
+            out.print("{\"state_flag\": \"1\"," + strTagList + ", " + strIngrList + "}");
             out.flush();
             
 
         } catch (FTException e) {
             System.out.println("\nError while accessing to FoodTinder:\n" + e.getMessage());
+            out.print("{\"state_flag\": \"0\"}");
+            out.flush();
         } catch (NumberFormatException nfe) {
             System.out.println("\nUnable to determine ID:\n" + nfe.getMessage());
+            out.print("{\"state_flag\": \"0\"}");
+            out.flush();
         }
         
         

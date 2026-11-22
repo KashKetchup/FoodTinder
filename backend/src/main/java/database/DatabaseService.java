@@ -239,7 +239,7 @@ public class DatabaseService {
 						res.getString("instructions"),
 						getIngredientsByRecipe(recipeId),
 						getTagsByRecipe(recipeId),
-						"image_path", //TODO откуда брать адрес изображения?
+						res.getString("image"), //TODO откуда брать адрес изображения?
 						res.getInt("cooking_time"),
 						res.getInt("rating"),
 						res.getDouble("calories"),
@@ -321,7 +321,7 @@ public class DatabaseService {
 						res.getString("instructions"),
 						getIngredientsByRecipe(recipeId),
 						getTagsByRecipe(recipeId),
-						"image_path", //TODO откуда брать адрес изображения?
+						res.getString("image"), //TODO откуда брать адрес изображения?
 						res.getInt("cooking_time"),
 						res.getInt("rating"),
 						res.getDouble("calories"),
