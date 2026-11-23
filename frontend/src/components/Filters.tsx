@@ -15,17 +15,13 @@ export function Filters({ onApply } : FiltersProps) {
     const [allTags, setAllTags] = useState<Tag[]>([]);
     
     useEffect(() => {
-    fetch("/backend/search")
-        .then((res) => res.json())
-        .then((data) => {
-            setAllIngs(data.ingredients);
-            setAllTags(data.tags)
-        })
-    })
-
-    const handleSearch = () => {
-        onApply();
-    }
+        fetch("/backend/search")
+            .then((res) => res.json())
+            .then((data) => {
+                setAllIngs(data.ingredients);
+                setAllTags(data.tags)
+            })
+    }, []);
 
     const handleClearAll = () => {
         setSearchParams({});
@@ -71,14 +67,14 @@ export function Filters({ onApply } : FiltersProps) {
             sectionDescription="Обязательные теги"
             inputPlaceholder="Введите тег и нажмите ','"
             emptyMessage="Нет обязательных тегов"
-            isBlackList={true} />
+            isBlackList={false} />
         
         <div className="action-buttons">
             <button className="btn-clear" onClick={handleClearAll}>
             🗑️ Очистить всё
             </button>
             
-            <button className="btn-search" onClick={handleSearch}>
+            <button className="btn-search" onClick={onApply}>
             🔍 Поиск рецептов
             </button>
         </div>

@@ -20,7 +20,7 @@ import tinderBack.Ingredient;
 
 import tomcatIntegration.FTServlet;
 
-@WebServlet(name = "search", urlPatterns = {"/search"})
+@WebServlet(name = "search", urlPatterns = {"/backend/search"})
 public class SearchServlet extends FTServlet {
     @Override 
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
@@ -38,14 +38,14 @@ public class SearchServlet extends FTServlet {
             String strTagList = "\"tags\": " + StringUtils.join('[', 
 				tags.stream().map(tag -> String.format(
                     "{\"id\": \"%d\"" + 
-                    ", \"tag_name\": \"%s\"}",
+                    ", \"title\": \"%s\"}",
                     tag.id(), tag.name()))
 				.collect(Collectors.joining(", ")), ']');
 
-            String strIngrList = "\"ingrediens\": " + StringUtils.join('[', 
+            String strIngrList = "\"ingredients\": " + StringUtils.join('[', 
 				ingr.stream().map(ingredient -> String.format(
                     "{\"id\": \"%d\"" + 
-                    ", \"ingr_name\": \"%s\"}",
+                    ", \"title\": \"%s\"}",
                     ingredient.id(), ingredient.name()))
 				.collect(Collectors.joining(", ")), ']');
 

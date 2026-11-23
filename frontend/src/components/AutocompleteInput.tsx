@@ -36,9 +36,14 @@ export function AutocompleteInput({ paramName, allElemsList,
     });
 
     useEffect(() => {
-        const params = new URLSearchParams();
-        params.set(paramName, elemsList.join(','));
-        setSearchParams(params); 
+        setSearchParams((prevParams) => {
+            if (elemsList.length === 0) {
+                prevParams.delete(paramName);
+            } else {
+                prevParams.set(paramName, elemsList.map((elem) => elem.id).join(','));
+            }
+            return prevParams;
+        }); 
     }, [elemsList, setSearchParams]);
 
     const filteredSuggestions = allElemsList.filter((elem) =>

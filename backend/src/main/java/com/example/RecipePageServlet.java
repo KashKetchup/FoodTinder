@@ -47,7 +47,7 @@ public class RecipePageServlet extends FTServlet{
                     ", \"fats\": \"%f\"" +
                     ", \"carbs\": \"%f\"" +
 	                ", \"difficulty\": \"%d\"" +
-                    ", \"instruction\": \"%s\"",
+                    ", \"instruction\": \"%s\"}",
 	                recipe.recipeId(), recipe.name(), recipe.description(),
 	                recipe.instruction(), recipe.imagePath(),
 	                recipe.cookingTime(), recipe.rate(), 
