@@ -66,7 +66,7 @@ export default function SearchScreen() {
 
   // Кнопка поиска — переход на главную с фильтрами
   const handleSearch = () => {
-    navigate('/');
+    navigate('/?include_ingredients=' + whiteList.join(','));
   };
 
   // Очистка всех фильтров

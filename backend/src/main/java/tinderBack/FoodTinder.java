@@ -27,9 +27,11 @@ public class FoodTinder {
         try {
             return m_dbService.getAllTags();
         } catch (DBException dbe) {
-            throw new FTException("DB err");
+            throw new FTException(dbe.getMessage());
         }
     }
+
+
 
     public List<Recipe> findRecomendRecipes (
         Set<Integer> includedTags, 
@@ -59,9 +61,12 @@ public class FoodTinder {
         }  
     }
 
+
     public Recipe getRecipe(int id) throws FTException {
         try {
             return m_dbService.getRecipe(id);
+
+            //DBException
         } catch (DBException dbe) {
             throw new FTException(dbe.getMessage());
         }

@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import tomcatIntegration.*;
 
 public class RecipePageServlet extends FTServlet{
@@ -18,10 +19,6 @@ public class RecipePageServlet extends FTServlet{
     throws ServletException, IOException {
 
         //Настройка для работы с React
-
-//        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-//        resp.setHeader("Access-Control-Allow-Methods", "GET, POST");
-//        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
@@ -61,11 +58,28 @@ public class RecipePageServlet extends FTServlet{
             out.print(jsonOut);
             out.flush();
 
-        } catch (NumberFormatException | FTException e) {
-            //TODO Подумать над реализацией исключений
+        } catch (FTException e) {
+            System.out.println("\nError while accessing to FoodTinder:\n" + e.getMessage());
+            out.print("{\"state_flag\": \"0\"}");
+            out.flush();
+        } catch (NumberFormatException nfe) {
+            System.out.println("\nUnable to determine ID:\n" + nfe.getMessage());
+            out.print("{\"state_flag\": \"0\"}");
+            out.flush();
         }
         
         
     }
 
 }
+
+
+
+        // //Настройка для работы с React
+
+        // resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
+        // resp.setHeader("Access-Control-Allow-Methods", "GET, POST");
+        // resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+        // resp.setContentType("application/json");
+        // resp.setCharacterEncoding("UTF-8");

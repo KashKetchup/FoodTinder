@@ -2,6 +2,7 @@ package tomcatIntegration;
 
 import database.DatabaseService;
 import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
 import tinderBack.FoodTinder;
 
 public class TomcatIntegration {
@@ -16,21 +17,20 @@ public class TomcatIntegration {
                 String pass = System.getenv("DB_PASS");
                 result = new DatabaseService(url, user, pass);
             } catch (Exception e) {
-                throw new TomcatIntegrationException();
+                throw new TomcatIntegrationException(e.getMessage());
             }
             ctx.setAttribute("database.DatabaseService", result);
         }
         
         return result;
     }
-    public static FoodTinder getFoodTinder(ServletContext ctx) throws TomcatIntegrationException {
+    public static FoodTinder getFoodTinder(ServletContext ctx) throws TomcatIntegrationException, ServletException {
         FoodTinder result = (FoodTinder)ctx.getAttribute("tinderBack.FoodTinder");
         if (result == null) {
             DatabaseService dbs = getDataBase(ctx);
             result = new FoodTinder(dbs);
             ctx.setAttribute("tinderBack.FoodTinder", result);
         }
-        
         return result;
     }
 }
