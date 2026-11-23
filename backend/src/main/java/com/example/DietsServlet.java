@@ -2,12 +2,10 @@ package com.example;
 
 import tinderBack.Diet;
 import tinderBack.FTException;
-import tinderBack.Recipe;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -49,18 +47,40 @@ public class DietsServlet extends FTServlet{
 
             List<Diet> diets = foodTinder.findRecomendDiets();
             /*
-             * Преобразование рецептов в массив объектов JSON
+             * Преобразование рационов в массив объектов JSON
              * Реализуется как StringUtils.join('[', str, ']'), где
              * str формируется из recipes с помощью Stream API с разделителями ", "
              */
-            out.print(StringUtils.join('[', 
-				diets.stream().map(diet -> String.format(
-                    "{\"id\": \"%d\"" + 
-                    ", \"description\": \"%s\"",
-                    diet.dietId(), diet.description()))
-				.collect(Collectors.joining(", ")), ']'));
+            out.print(StringUtils.join('[',
+            		diets.stream().map(diet -> String.format(
+            				"{\"id\": \"%d\"" + 
+						    ", \"description\": \"%s\"" +
+						    ", \"recipes\": %s}",
+						    diet.dietId(), diet.description(),
+						    StringUtils.join('[',
+						    		diet.recipes().stream().map(recipes -> StringUtils.join('[',
+						    				recipes.stream().map(recipe -> String.format(
+						    						"{\"id\": \"%d\"" + 
+				    			                    ", \"title\": \"%s\"" + 
+				    			                    ", \"description\": \"%s\"" + 
+				    			                    ", \"instruction\": \"%s\"" +
+				    			                    ", \"image_url\": \"%s\"" +
+				    			                    ", \"cookingTime\": \"%d\"" +
+				    			                    ", \"rate\": \"%d\"" +
+				    			                    ", \"calories\": \"%f\"" +
+				    			                    ", \"difficulty\": \"%d\"}",
+				    			                    recipe.recipeId(), recipe.name(), recipe.description(),
+				    			                    recipe.instruction(), recipe.imagePath(),
+				    			                    recipe.cookingTime(), recipe.rate(), 
+				    			                    recipe.calories(), recipe.difficulty()))
+						    				.collect(Collectors.joining(", ")),
+						    				']'))
+						    		.collect(Collectors.joining(", ")),
+						    		']')))
+            		.collect(Collectors.joining(", ")), ']'));
             out.flush();
         } catch (NumberFormatException | FTException e) {
+        	System.out.println(e.getMessage());
             //TODO Подумать над реализацией исключений
         }
         

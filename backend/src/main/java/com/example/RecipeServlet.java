@@ -58,21 +58,25 @@ public class RecipeServlet extends FTServlet{
                     "{\"id\": \"%d\"" + 
                     ", \"title\": \"%s\"" + 
                     ", \"description\": \"%s\"" + 
-                    ", \"instruction\": \"%s\"" +
                     ", \"image_url\": \"%s\"" +
                     ", \"cookingTime\": \"%d\"" +
                     ", \"rate\": \"%d\"" +
                     ", \"calories\": \"%f\"" +
+                    ", \"proteins\": \"%f\"" +
+                    ", \"fats\": \"%f\"" +
+                    ", \"carbs\": \"%f\"" +
                     ", \"difficulty\": \"%d\"}",
-                    recipe.recipeId(), recipe.name(), recipe.description(),
-                    recipe.instruction(), recipe.imagePath(),
+                    recipe.recipeId(), recipe.name(),
+                    recipe.description(), recipe.imagePath(),
                     recipe.cookingTime(), recipe.rate(), 
-                    recipe.calories(), recipe.difficulty()))
+                    recipe.calories(), recipe.proteins(),
+                    recipe.fats(), recipe.carbs(), recipe.difficulty()))
 				.collect(Collectors.joining(", ")), ']'));
             out.flush();
         } catch (NumberFormatException | FTException e) {
         	e.printStackTrace();
         	System.out.println(e.getMessage());
+        	e.printStackTrace();
             //TODO Подумать над реализацией исключений
         }
         

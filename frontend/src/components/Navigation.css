@@ -1,0 +1,57 @@
+/* ===== НИЖНЯЯ ПАНЕЛЬ НАВИГАЦИИ ===== */
+.bottom-nav {
+  position: fixed; /* Фиксируем внизу экрана */
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%); /* Центрируем относительно max-width */
+  width: 100%;
+  max-width: 480px;
+  background-color: #ffffff;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 8px 0;
+  padding-bottom: max(8px, env(safe-area-inset-bottom)); /* Учет челки/полоски на iPhone */
+  z-index: 100;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.nav-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 12px;
+  border-radius: 8px;
+  transition: color 0.2s ease;
+}
+
+.nav-icon {
+  font-size: 22px;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+/* Состояние при наведении (для десктопа) */
+.nav-btn:hover {
+  color: #4a6cf7;
+}
+.nav-btn:hover .nav-icon {
+  transform: translateY(-2px);
+}
+
+/* Активное состояние (текущая страница) */
+.nav-btn.active {
+  color: #4a6cf7;
+}
+
+.nav-btn.active .nav-icon {
+  transform: scale(1.1);
+}

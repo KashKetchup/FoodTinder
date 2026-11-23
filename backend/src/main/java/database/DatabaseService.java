@@ -40,8 +40,8 @@ public class DatabaseService {
 				,SUM(i.fats * ri.amount) AS fats
 				,SUM(i.carbs * ri.amount) AS carbs
 			FROM recipes r 
-				JOIN recipes_ingredients ri ON ri.recipe_id = r.id
-				JOIN ingredients i ON i.id = ri.ingredient_id 
+				INNER JOIN recipes_ingredients ri ON ri.recipe_id = r.id
+				INNER JOIN ingredients i ON i.id = ri.ingredient_id 
 			GROUP BY r.id
 			HAVING r.id = ?;
 			""";
@@ -54,7 +54,7 @@ public class DatabaseService {
 			SELECT i.*
 				,ri.amount AS amount
 			FROM ingredients i 
-				JOIN recipes_ingredients ri ON ri.ingredient_id = i.id 
+				INNER JOIN recipes_ingredients ri ON ri.ingredient_id = i.id 
 			WHERE ri.recipe_id = ?;
 			""";
 	
@@ -65,7 +65,7 @@ public class DatabaseService {
 			"""
 			SELECT t.* 
 			FROM tags t 
-				JOIN recipes_tags rt ON rt.tag_id = t.id 
+				INNER JOIN recipes_tags rt ON rt.tag_id = t.id 
 			WHERE rt.recipe_id = ?;
 			""";
 	
@@ -82,6 +82,7 @@ public class DatabaseService {
 			FROM recipes r 
 				INNER JOIN recipes_tags rt ON r.id = rt.recipe_id 
 				INNER JOIN recipes_ingredients ri ON r.id = ri.recipe_id 
+				INNER JOIN ingredients i ON i.id = ri.ingredient_id
 			GROUP BY r.id 
 			HAVING COUNT(DISTINCT IIF(rt.tag_id IN (%s), rt.tag_id, NULL)) = ? 
 				AND COUNT(DISTINCT IIF(rt.tag_id IN (%s), rt.tag_id, NULL)) = 0 
@@ -136,10 +137,18 @@ public class DatabaseService {
 	private static final String QUERY_GET_DIET_RECIPES = 
 			"""
 			SELECT r.*
-				,di.time AS time
-			FROM recipes
-				JOIN diets_recipes di ON di.recipe_id = r.id
-			WHERE di.diet_id = ?;
+				,SUM(i.calories * ri.amount) AS calories
+				,SUM(i.proteins * ri.amount) AS proteins
+				,SUM(i.fats * ri.amount) AS fats
+				,SUM(i.carbs * ri.amount) AS carbs
+				,dr.meal_number AS meal_number
+			FROM recipes r
+				INNER JOIN diets_recipes dr ON dr.recipe_id = r.id
+				INNER JOIN recipes_ingredients ri ON ri.recipe_id = r.id
+				INNER JOIN ingredients i ON i.id = ri.ingredient_id
+			GROUP BY dr.diet_id
+				,r.id
+			HAVING dr.diet_id = ?;
 			""";
 	
 	/**
@@ -148,9 +157,18 @@ public class DatabaseService {
 	private static final String QUERY_GET_DIET_RECIPES_FOR_TIME = 
 			"""
 			SELECT r.*
-			FROM recipes
-				JOIN diets_recipes di ON di.recipe_id = r.id
-			WHERE di.diet_id = ? AND time = ?;
+				,SUM(i.calories * ri.amount) AS calories
+				,SUM(i.proteins * ri.amount) AS proteins
+				,SUM(i.fats * ri.amount) AS fats
+				,SUM(i.carbs * ri.amount) AS carbs
+			FROM recipes r
+				INNER JOIN diets_recipes dr ON dr.recipe_id = r.id
+				INNER JOIN recipes_ingredients ri ON ri.recipe_id = r.id
+				INNER JOIN ingredients i ON i.id = ri.ingredient_id
+			GROUP BY dr.diet_id
+				,r.id
+			HAVING dr.diet_id = ?
+				AND dr.meal_number = ?;
 			""";
 	
 	/**
@@ -463,7 +481,7 @@ public class DatabaseService {
 				return new Diet(res.getInt("id"),
 						res.getString("description"),
 						getDietRecipes(dietId).entrySet().stream()
-							.sorted().map(Map.Entry::getValue).toList());
+							.sorted(Map.Entry.comparingByKey()).map(Map.Entry::getValue).toList());
 			}
 		} catch (SQLException e) {
 			throw new DBException("Error during data reading: " + e.getMessage());
@@ -486,7 +504,7 @@ public class DatabaseService {
 				tags.add(new Diet(dietId, 
 						res.getString("description"),
 						getDietRecipes(dietId).entrySet().stream()
-							.sorted().map(Map.Entry::getValue).toList()));
+							.sorted(Map.Entry.comparingByKey()).map(Map.Entry::getValue).toList()));
 			}
 			return List.copyOf(tags);
 		} catch (SQLException e) {
@@ -505,11 +523,11 @@ public class DatabaseService {
 			Map<Integer, List<Recipe>> dietRecipes = new HashMap<Integer, List<Recipe>>();
 			List<Recipe> recipes = null;
 			while (res.next()) {
-				int time = res.getInt("time");
+				int time = res.getInt("meal_number");
 				if (dietRecipes.get(time) == null) {
 					dietRecipes.put(time, new ArrayList<Recipe>());
 				}
-				recipes = dietRecipes.get(res.getInt("time"));
+				recipes = dietRecipes.get(res.getInt("meal_number"));
 				int recipeId = res.getInt("id");
 				recipes.add(new Recipe(
 						recipeId,

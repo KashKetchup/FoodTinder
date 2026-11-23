@@ -67,4 +67,12 @@ public class FoodTinder {
         }
     }
     
+    public Diet getDiet(int id) throws FTException {
+        try {
+            return m_dbService.getDiet(id);
+        } catch (DBException dbe) {
+            throw new FTException(dbe.getMessage());
+        }
+    }
+    
 }
