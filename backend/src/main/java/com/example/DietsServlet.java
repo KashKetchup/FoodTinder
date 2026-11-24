@@ -39,49 +39,27 @@ public class DietsServlet extends FTServlet{
         PrintWriter out = resp.getWriter();
 
         try {
-            
-//            Set<Integer> includeIngredient = parseNumbers(req.getParameter("in_ingr"));
-//            Set<Integer> includeTag = parseNumbers(req.getParameter("in_tag"));
-//            Set<Integer> excludeIngredient = parseNumbers(req.getParameter("ex_ingr"));
-//            Set<Integer> excludeTag = parseNumbers(req.getParameter("ex_tag"));
+            int daysCount = Integer.parseInt(req.getParameter("days_count"));
+            Set<Integer> includeIngredient = parseNumbers(req.getParameter("in_ingr"));
+            Set<Integer> includeTag = parseNumbers(req.getParameter("in_tag"));
+            Set<Integer> excludeIngredient = parseNumbers(req.getParameter("ex_ingr"));
+            Set<Integer> excludeTag = parseNumbers(req.getParameter("ex_tag"));
 
-            List<Diet> diets = foodTinder.findRecomendDiets();
+            List<Diet> diets = foodTinder.findRecomendDiets(daysCount, 
+            		includeTag, excludeTag, includeIngredient, excludeIngredient);
             /*
              * Преобразование рационов в массив объектов JSON
              * Реализуется как StringUtils.join('[', str, ']'), где
              * str формируется из recipes с помощью Stream API с разделителями ", "
              */
             out.print(StringUtils.join('[',
-            		diets.stream().map(diet -> String.format(
-            				"{\"id\": \"%d\"" + 
-						    ", \"description\": \"%s\"" +
-						    ", \"recipes\": %s}",
-						    diet.dietId(), diet.description(),
-						    StringUtils.join('[',
-						    		diet.recipes().stream().map(recipes -> StringUtils.join('[',
-						    				recipes.stream().map(recipe -> String.format(
-						    						"{\"id\": \"%d\"" + 
-				    			                    ", \"title\": \"%s\"" + 
-				    			                    ", \"description\": \"%s\"" + 
-				    			                    ", \"instruction\": \"%s\"" +
-				    			                    ", \"image_url\": \"%s\"" +
-				    			                    ", \"cookingTime\": \"%d\"" +
-				    			                    ", \"rate\": \"%d\"" +
-				    			                    ", \"calories\": \"%f\"" +
-				    			                    ", \"difficulty\": \"%d\"}",
-				    			                    recipe.recipeId(), recipe.name(), recipe.description(),
-				    			                    recipe.instruction(), recipe.imagePath(),
-				    			                    recipe.cookingTime(), recipe.rate(), 
-				    			                    recipe.calories(), recipe.difficulty()))
-						    				.collect(Collectors.joining(", ")),
-						    				']'))
-						    		.collect(Collectors.joining(", ")),
-						    		']')))
+            		diets.stream().map(diet -> ServletUtils.convertDietToJSON(diet))
             		.collect(Collectors.joining(", ")), ']'));
             out.flush();
-        } catch (NumberFormatException | FTException e) {
-        	System.out.println(e.getMessage());
-            //TODO Подумать над реализацией исключений
+        } catch (FTException e) {
+            System.out.println("\nError while accessing to FoodTinder:\n" + e.getMessage());
+        } catch (NumberFormatException nfe) {
+            System.out.println("\nUnable to determine ID:\n" + nfe.getMessage());
         }
         
     }
@@ -89,12 +67,14 @@ public class DietsServlet extends FTServlet{
     private static Set<Integer> parseNumbers(String argumentValue) {
         Set<Integer> result = new HashSet<>();
         try {
-            if (argumentValue != null) {
+            if (argumentValue != null && !argumentValue.isEmpty()) {
                 for(String strNumber : argumentValue.split(",")) {
                     result.add(Integer.parseInt(strNumber));
                 }
             }
-        } catch (NumberFormatException nfe) {} // Хотим просто вернуть, что было
+        } catch (NumberFormatException nfe) {
+            System.out.println("\nUnable to determine ID:\n" + nfe.getMessage());
+        } // Хотим просто вернуть, что было
 
         return result;
     }

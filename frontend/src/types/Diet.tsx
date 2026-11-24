@@ -3,5 +3,7 @@ import { Recipe } from './Recipe.tsx';
 export interface Diet {
   id: number;
   description: string;
-  recipes: Array<Array<Recipe>>
+  breakfast: Recipe;
+  lunch: Recipe;
+  dinner: Recipe; 
 }

@@ -40,40 +40,13 @@ public class DietPageServlet extends FTServlet{
             if (diet == null) {
             	jsonOut = "{}";
             } else {
-            	jsonOut = String.format(
-            		"{\"id\": \"%d\"" + 
-				    ", \"description\": \"%s\"" +
-				    ", \"recipes\": %s}",
-				    diet.dietId(), diet.description(),
-				    StringUtils.join('[',
-				    		diet.recipes().stream().map(recipes -> StringUtils.join('[',
-				    				recipes.stream().map(recipe -> String.format(
-				    						"{\"id\": \"%d\"" + 
-		    			                    ", \"title\": \"%s\"" + 
-		    			                    ", \"description\": \"%s\"" + 
-		    			                    ", \"instruction\": \"%s\"" +
-		    			                    ", \"image_url\": \"%s\"" +
-		    			                    ", \"cookingTime\": \"%d\"" +
-		    			                    ", \"rate\": \"%d\"" +
-		    			                    ", \"calories\": \"%f\"" +
-		    			                    ", \"difficulty\": \"%d\"}",
-		    			                    recipe.recipeId(), recipe.name(), recipe.description(),
-		    			                    recipe.instruction(), recipe.imagePath(),
-		    			                    recipe.cookingTime(), recipe.rate(), 
-		    			                    recipe.calories(), recipe.difficulty()))
-				    				.collect(Collectors.joining(", ")),
-				    				']'))
-				    		.collect(Collectors.joining(", ")),
-				    		']'));
+            	jsonOut = ServletUtils.convertDietToJSON(diet);
             }
             out.print(jsonOut);
             out.flush();
 
         } catch (NumberFormatException | FTException e) {
             //TODO Подумать над реализацией исключений
-        }
-        
-        
+        }        
     }
-
 }

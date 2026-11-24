@@ -58,10 +58,12 @@ export default function RecipesScreen() {
   }
 
   if (filterOpen) {
-      return <Filters onApply={() => {
-          setFilterOpen(false);
-          loadData();
-      }}/>;
+      return <Filters 
+        forDiets={false}
+        onApply={() => {
+            setFilterOpen(false);
+            loadData();
+        }}/>;
   }
 
   return (

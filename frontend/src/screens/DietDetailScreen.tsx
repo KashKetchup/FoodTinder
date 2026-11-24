@@ -8,7 +8,6 @@ import './DietDetailScreen.css';
 export default function DietDetailScreen() {
   const navigate = useNavigate();
   
-  // ТИПИЗИРУЕМ СОСТОЯНИЕ (STATE)
   const [diet, setDiet] = useState<Diet | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 

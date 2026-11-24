@@ -49,23 +49,7 @@ public class RecipeServlet extends FTServlet{
              * str формируется из recipes с помощью Stream API с разделителями ", "
              */
             out.print(StringUtils.join('[', 
-				recipes.stream().map(recipe -> String.format(
-                    "{\"id\": \"%d\"" + 
-                    ", \"title\": \"%s\"" + 
-                    ", \"description\": \"%s\"" + 
-                    ", \"image_url\": \"%s\"" +
-                    ", \"cookingTime\": \"%d\"" +
-                    ", \"rate\": \"%d\"" +
-                    ", \"calories\": \"%f\"" +
-                    ", \"proteins\": \"%f\"" +
-                    ", \"fats\": \"%f\"" +
-                    ", \"carbs\": \"%f\"" +
-                    ", \"difficulty\": \"%d\"}",
-                    recipe.recipeId(), recipe.name(),
-                    recipe.description(), recipe.imagePath(),
-                    recipe.cookingTime(), recipe.rate(), 
-                    recipe.calories(), recipe.proteins(),
-                    recipe.fats(), recipe.carbs(), recipe.difficulty()))
+				recipes.stream().map(recipe -> ServletUtils.convertRecipeToJSON(recipe))
 				.collect(Collectors.joining(", ")), ']'));
             out.flush();
         } catch (FTException e) {
@@ -79,7 +63,7 @@ public class RecipeServlet extends FTServlet{
     private static Set<Integer> parseNumbers(String argumentValue) {
         Set<Integer> result = new HashSet<>();
         try {
-            if (argumentValue != null && !argumentValue.equals("null")) {
+            if (argumentValue != null && !argumentValue.isEmpty()) {
                 
                 for(String strNumber : argumentValue.split(",")) {
                     result.add(Integer.parseInt(strNumber));

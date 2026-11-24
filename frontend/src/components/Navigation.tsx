@@ -14,18 +14,26 @@ export function Navigation() {
     return (
       <nav className="bottom-nav">
         <button 
-          className={`nav-btn ${location.pathname === '/recipes' ? 'active' : ''}`} 
-          onClick={() => handleNavClick('/recipes')}
+          className={`nav-btn ${location.pathname === '/' ? 'active' : ''}`} 
+          onClick={() => handleNavClick('/')}
         >
           <span className="nav-icon">🏠</span>
           <span>Home</span>
         </button>
 
         <button 
-          className={`nav-btn ${location.pathname === '/search' ? 'active' : ''}`} 
-          onClick={() => handleNavClick('/search')}
+          className={`nav-btn ${location.pathname === '/recipes' ? 'active' : ''}`} 
+          onClick={() => handleNavClick('/recipes')}
         >
-          <span className="nav-icon">🔍</span>
+          <span className="nav-icon">🍕</span>
+          <span>Search</span>
+        </button>
+
+        <button 
+          className={`nav-btn ${location.pathname === '/diets' ? 'active' : ''}`} 
+          onClick={() => handleNavClick('/diets')}
+        >
+          <span className="nav-icon">🍽️</span>
           <span>Search</span>
         </button>
 

@@ -89,7 +89,7 @@ export function AutocompleteInput({ paramName, allElemsList,
             onFocus={() => setOpenHint(true)}
             onBlur={() => setTimeout(() => setOpenHint(false), 150)}
           />
-          {openHint && elemsListInput.trim() !== '' && filteredSuggestions.length > 0 && (
+          {openHint && filteredSuggestions.length > 0 && (
             <ul className="hint-list">
             {filteredSuggestions.map((elem) => (
                 <li className="hint-option"

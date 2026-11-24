@@ -28,7 +28,11 @@ import java.sql.Connection;
 /**
  * Сервис работы с базой данных
  */
-public class DatabaseService {	
+public class DatabaseService {
+	private static final int BREAKFAST_TAG_ID = 1;
+	private static final int LUNCH_TAG_ID = 2;
+	private static final int DINNER_TAG_ID = 3;
+	
 	/**
 	 * Запрос получения рецепта
 	 */
@@ -480,8 +484,9 @@ public class DatabaseService {
 			if (res.next()) {
 				return new Diet(res.getInt("id"),
 						res.getString("description"),
-						getDietRecipes(dietId).entrySet().stream()
-							.sorted(Map.Entry.comparingByKey()).map(Map.Entry::getValue).toList());
+						getRecipe(res.getInt("breakfast")),
+						getRecipe(res.getInt("lunch")),
+						getRecipe(res.getInt("dinner")));
 			}
 		} catch (SQLException e) {
 			throw new DBException("Error during data reading: " + e.getMessage());
@@ -489,63 +494,55 @@ public class DatabaseService {
 		return null;
 	}
 
+	public List<Recipe> getBreakfasts(int count,
+			Set<Integer> tagsIdsInclude, Set<Integer> tagsIdsExclude,
+			Set<Integer> ingredientsIdsInclude, Set<Integer> ingredientsIdsExclude) throws DBException {
+		Set<Integer> tagsIdsIncludeMod = new HashSet<Integer>(tagsIdsInclude);
+		tagsIdsIncludeMod.add(BREAKFAST_TAG_ID);
+		return getRecipesByTags(count, tagsIdsIncludeMod, 
+				tagsIdsExclude, ingredientsIdsInclude, ingredientsIdsExclude);
+	}
+	
+	public List<Recipe> getLunches(int count,
+			Set<Integer> tagsIdsInclude, Set<Integer> tagsIdsExclude,
+			Set<Integer> ingredientsIdsInclude, Set<Integer> ingredientsIdsExclude) throws DBException {
+		Set<Integer> tagsIdsIncludeMod = new HashSet<Integer>(tagsIdsInclude);
+		tagsIdsIncludeMod.add(LUNCH_TAG_ID);
+		return getRecipesByTags(count, tagsIdsIncludeMod, 
+				tagsIdsExclude, ingredientsIdsInclude, ingredientsIdsExclude);
+	}
+	
+	public List<Recipe> getDinners(int count,
+			Set<Integer> tagsIdsInclude, Set<Integer> tagsIdsExclude,
+			Set<Integer> ingredientsIdsInclude, Set<Integer> ingredientsIdsExclude) throws DBException {
+		Set<Integer> tagsIdsIncludeMod = new HashSet<Integer>(tagsIdsInclude);
+		tagsIdsIncludeMod.add(DINNER_TAG_ID);
+		return getRecipesByTags(count, tagsIdsIncludeMod, 
+				tagsIdsExclude, ingredientsIdsInclude, ingredientsIdsExclude);
+	}
+	
 	/**
 	 * Получить список всех рационов
 	 * @return неизменяемый список экземпляров Diet, никогда не возвращает null
 	 * @throws DBException если произошла ошибка при работе с базой данных
 	 * @see Diet
 	 */
-	public List<Diet> getAllDiets() throws DBException {
-		CachedRowSet res = queryAllDietsFromDB();
+	public List<Diet> getDietsByTags(int count, int offset,
+			Set<Integer> tagsIdsInclude, Set<Integer> tagsIdsExclude,
+			Set<Integer> ingredientsIdsInclude, Set<Integer> ingredientsIdsExclude) throws DBException {
+		CachedRowSet res = queryDietsFromDBUndConds(count, offset, tagsIdsInclude,
+				tagsIdsExclude, ingredientsIdsInclude, ingredientsIdsExclude);
 		try {
 			List<Diet> tags = new ArrayList<Diet>();
 			while (res.next()) {
 				int dietId = res.getInt("id");
 				tags.add(new Diet(dietId, 
 						res.getString("description"),
-						getDietRecipes(dietId).entrySet().stream()
-							.sorted(Map.Entry.comparingByKey()).map(Map.Entry::getValue).toList()));
+						getRecipe(res.getInt("breakfast")),
+						getRecipe(res.getInt("lunch")),
+						getRecipe(res.getInt("dinner"))));
 			}
 			return List.copyOf(tags);
-		} catch (SQLException e) {
-			throw new DBException("Error during data reading: " + e.getMessage());
-		}
-	}
-
-	/**
-	 * 
-	 * @throws DBException 
-	 * 
-	 */
-	private Map<Integer, List<Recipe>> getDietRecipes(int dietId) throws DBException {
-		CachedRowSet res = queryDietRecipesFromDB(dietId);
-		try {
-			Map<Integer, List<Recipe>> dietRecipes = new HashMap<Integer, List<Recipe>>();
-			List<Recipe> recipes = null;
-			while (res.next()) {
-				int time = res.getInt("meal_number");
-				if (dietRecipes.get(time) == null) {
-					dietRecipes.put(time, new ArrayList<Recipe>());
-				}
-				recipes = dietRecipes.get(res.getInt("meal_number"));
-				int recipeId = res.getInt("id");
-				recipes.add(new Recipe(
-						recipeId,
-						res.getString("name"),
-						res.getString("description"),
-						res.getString("instructions"),
-						getIngredientsByRecipe(recipeId),
-						getTagsByRecipe(recipeId),
-						res.getString("image"),
-						res.getInt("cooking_time"),
-						res.getInt("rating"),
-						res.getDouble("calories"),
-						res.getDouble("proteins"),
-						res.getDouble("fats"),
-						res.getDouble("carbs"),
-						res.getInt("difficulty")));
-			}
-			return dietRecipes;
 		} catch (SQLException e) {
 			throw new DBException("Error during data reading: " + e.getMessage());
 		}
@@ -715,7 +712,9 @@ public class DatabaseService {
 	 * @return
 	 * @throws DBException 
 	 */
-	private CachedRowSet queryAllDietsFromDB() throws DBException {
+	private CachedRowSet queryDietsFromDBUndConds(int count, int offset,
+			Set<Integer> tagsIdsInclude, Set<Integer> tagsIdsExclude,
+			Set<Integer> ingredientsIdsInclude, Set<Integer> ingredientsIdsExclude) throws DBException {
 		try (Connection conn = m_dataSource.getConnection();
 				PreparedStatement stmt = conn.prepareStatement(QUERY_GET_ALL_DIETS)) {
 			CachedRowSet res = m_factory.createCachedRowSet();
