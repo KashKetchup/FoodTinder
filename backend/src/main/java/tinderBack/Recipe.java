@@ -13,5 +13,8 @@ public record Recipe(
     int cookingTime,
     int rate,
     double calories,
+    double proteins,
+    double fats,
+    double carbs,
     int difficulty
 ) {}
