@@ -38,14 +38,14 @@ public class SearchServlet extends FTServlet {
             String strTagList = "\"tags\": " + StringUtils.join('[', 
 				tags.stream().map(tag -> String.format(
                     "{\"id\": \"%d\"" + 
-                    ", \"tag_name\": \"%s\"}",
+                    ", \"title\": \"%s\"}",
                     tag.id(), tag.name()))
 				.collect(Collectors.joining(", ")), ']');
 
             String strIngrList = "\"ingrediens\": " + StringUtils.join('[', 
 				ingr.stream().map(ingredient -> String.format(
                     "{\"id\": \"%d\"" + 
-                    ", \"ingr_name\": \"%s\"}",
+                    ", \"title\": \"%s\"}",
                     ingredient.id(), ingredient.name()))
 				.collect(Collectors.joining(", ")), ']');
 

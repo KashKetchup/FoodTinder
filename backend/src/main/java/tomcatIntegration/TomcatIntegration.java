@@ -1,9 +1,11 @@
 package tomcatIntegration;
 
+
 import database.DatabaseService;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 import tinderBack.FoodTinder;
+import java.util.WeakHashMap;
 
 public class TomcatIntegration {
     public static DatabaseService getDataBase(ServletContext ctx) 
@@ -26,6 +28,7 @@ public class TomcatIntegration {
     public static FoodTinder getFoodTinder(ServletContext ctx) throws TomcatIntegrationException, ServletException {
         FoodTinder result = (FoodTinder)ctx.getAttribute("tinderBack.FoodTinder");
         if (result == null) {
+            WeakHashMap
             DatabaseService dbs = getDataBase(ctx);
             result = new FoodTinder(dbs);
             ctx.setAttribute("tinderBack.FoodTinder", result);
