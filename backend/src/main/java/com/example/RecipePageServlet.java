@@ -30,23 +30,32 @@ public class RecipePageServlet extends FTServlet{
         try {
             Integer id = Integer.parseInt(req.getParameter("id"));
             Recipe recipe = foodTinder.getRecipe(id);
-
-            out.println("{\"state_flag\": \"1\"," +
-                String.format(
-                "\"id\": \"%d\"" + 
-                ", \"title\": \"%s\"" + 
-                ", \"description\": \"%s\"" + 
-                ", \"instruction\": \"%s\"" +
-                ", \"image_url\": \"%s\"" +
-                ", \"cookingTime\": \"%d\"" +
-                ", \"rate\": \"%d\"" +
-                ", \"calories\": \"%f\"" +
-                ", \"difficulty\": \"%d\"}",
-                recipe.recipeId(), recipe.name(), recipe.description(),
-                recipe.instruction(), recipe.imagePath(),
-                recipe.cookingTime(), recipe.rate(), 
-                recipe.calories(), recipe.difficulty()
-            ));
+            String jsonOut;
+            if (recipe == null) {
+            	jsonOut = "{}";
+            } else {
+            	jsonOut = String.format(
+	                "{\"id\": \"%d\"" + 
+	                ", \"title\": \"%s\"" + 
+	                ", \"description\": \"%s\"" + 
+	                ", \"instruction\": \"%s\"" +
+	                ", \"image_url\": \"%s\"" +
+	                ", \"cookingTime\": \"%d\"" +
+	                ", \"rate\": \"%d\"" +
+                    ", \"calories\": \"%f\"" +
+                    ", \"proteins\": \"%f\"" +
+                    ", \"fats\": \"%f\"" +
+                    ", \"carbs\": \"%f\"" +
+	                ", \"difficulty\": \"%d\"" +
+                    ", \"instruction\": \"%s\"}",
+	                recipe.recipeId(), recipe.name(), recipe.description(),
+	                recipe.instruction(), recipe.imagePath(),
+	                recipe.cookingTime(), recipe.rate(), 
+	                recipe.calories(), recipe.proteins(),
+	                recipe.fats(), recipe.carbs(), recipe.difficulty(),
+	                recipe.instruction());
+            }
+            out.print(jsonOut);
             out.flush();
 
         } catch (FTException e) {

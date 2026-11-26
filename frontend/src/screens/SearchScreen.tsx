@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Navigation } from '../components/Navigation.tsx';
 import './SearchScreen.css';
 
 // При добавлении базы реализовать Автодополнение с задержкой (Debounced Autocomplete) для выпадающих тегов/ингридиентов
@@ -161,25 +162,7 @@ export default function SearchScreen() {
         </button>
       </div>
 
-      {/* Нижняя навигация */}
-      <nav className="bottom-nav">
-        <button className="nav-btn" onClick={() => navigate('/')}>
-          <span className="nav-icon">🏠</span>
-          <span>Home</span>
-        </button>
-        <button className="nav-btn active" onClick={() => navigate('/search')}>
-          <span className="nav-icon">🔍</span>
-          <span>Search</span>
-        </button>
-        <button className="nav-btn" onClick={() => navigate('/favorites')}>
-          <span className="nav-icon">❤️</span>
-          <span>Favorites</span>
-        </button>
-        <button className="nav-btn" onClick={() => navigate('/login')}>
-          <span className="nav-icon">👤</span>
-          <span>Login</span>
-        </button>
-      </nav>
+     <Navigation />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Navigation } from '../components/Navigation.tsx';
 import './LoginScreen.css';
 
 export default function LoginScreen() {
@@ -69,40 +70,7 @@ export default function LoginScreen() {
           </button>
         </div>
       </div>
-      {/* Нижняя панель навигации (Absolute/Fixed) */}
-      <nav className="bottom-nav">
-        <button 
-          className={`nav-btn ${location.pathname === '/' ? 'active' : ''}`} 
-          onClick={() => handleNavClick('/')}
-        >
-          <span className="nav-icon">🏠</span>
-          <span>Home</span>
-        </button>
-
-        <button 
-          className={`nav-btn ${location.pathname === '/search' ? 'active' : ''}`} 
-          onClick={() => handleNavClick('/search')}
-        >
-          <span className="nav-icon">🔍</span>
-          <span>Search</span>
-        </button>
-
-        <button 
-          className={`nav-btn ${location.pathname === '/favorites' ? 'active' : ''}`} 
-          onClick={() => handleNavClick('/favorites')}
-        >
-          <span className="nav-icon">❤️</span>
-          <span>Favorites</span>
-        </button>
-
-        <button 
-          className={`nav-btn ${location.pathname === '/login' ? 'active' : ''}`} 
-          onClick={() => handleNavClick('/login')}
-        >
-          <span className="nav-icon">👤</span>
-          <span>Login</span>
-        </button>
-      </nav>
+     <Navigation />
     </div>
   );
 }

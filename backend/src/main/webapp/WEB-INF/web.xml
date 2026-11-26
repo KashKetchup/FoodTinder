@@ -18,23 +18,32 @@
     </servlet-mapping>
     
     <servlet>
-        <servlet-name>recipe</servlet-name>
+        <servlet-name>recipes</servlet-name>
         <servlet-class>com.example.RecipeServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>recipe</servlet-name>
-        <url-pattern>/backend/main</url-pattern>
+        <servlet-name>recipes</servlet-name>
+        <url-pattern>/backend/recipes</url-pattern>
     </servlet-mapping>
-
-    <servlet>
-        <servlet-name>search</servlet-name>
-        <servlet-class>com.example.SearchServlet</servlet-class>
+	
+	<servlet>
+        <servlet-name>dietPage</servlet-name>
+        <servlet-class>com.example.DietPageServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>
-        <servlet-name>search</servlet-name>
-        <url-pattern>/backend/search</url-pattern>
+        <servlet-name>dietPage</servlet-name>
+        <url-pattern>/backend/diet</url-pattern>
     </servlet-mapping>
+	
+    <servlet>
+        <servlet-name>diets</servlet-name>
+        <servlet-class>com.example.DietsServlet</servlet-class>
+    </servlet>
 
+    <servlet-mapping>
+        <servlet-name>diets</servlet-name>
+        <url-pattern>/backend/diets</url-pattern>
+    </servlet-mapping>
 </web-app>

@@ -1,21 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import type { Recipe } from '../types/Recipe.tsx';
+import { Navigation } from '../components/Navigation.tsx';
 import './RecipeDetailScreen.css';
-
-// ИНТЕРФЕЙС
-interface Recipe {
-  id: number;
-  title: string;
-  description: string;
-  instruction: string;
-  ingredients: Object;
-  tags: Object;
-  image_url: string;
-  cookingTime: number;
-  rate: number;
-  calories: number;
-  difficulty: number;
-}
 
 export default function RecipeDetailScreen() {
   const navigate = useNavigate();
@@ -57,9 +44,10 @@ export default function RecipeDetailScreen() {
     return (
       <div className="container">
         <h2>Рецепт не найден</h2>
-        <button className="back-button" onClick={() => navigate(-1)}>
+        <button className="back-button" onClick={() => navigate('/recipes')}>
           ← Назад
         </button>
+        <Navigation />
       </div>
     );
   }
@@ -67,13 +55,14 @@ export default function RecipeDetailScreen() {
   // Основной рендер
   return (
     <div className="container recipe-detail">
-      <button className="back-button" onClick={() => navigate(-1)}>
+      <button className="back-button" onClick={() => navigate('/recipes')}>
         ← Назад
       </button>
       
       <img src={recipe.image_url} alt={recipe.title} className="detail-image" />
       <h1 className="detail-title">{recipe.title}</h1>
       <p className="detail-description">{recipe.description}</p>
+      <Navigation />
     </div>
   );
 }
