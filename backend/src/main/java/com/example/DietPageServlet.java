@@ -45,8 +45,18 @@ public class DietPageServlet extends FTServlet{
             out.print(jsonOut);
             out.flush();
 
-        } catch (NumberFormatException | FTException e) {
-            //TODO Подумать над реализацией исключений
-        }        
+        } catch (FTException e) {
+            System.out.println("\nDietPageServlet: Error while accessing to FoodTinder:\n" 
+                + e.getMessage());
+            out.print("{\"state_flag\": \"0\"}");
+            out.flush();
+        } catch (NumberFormatException nfe) {
+            System.out.println("\nDietPageServlet: Unable to determine ID:\n" 
+                + nfe.getMessage());
+            out.print("{\"state_flag\": \"0\"}");
+            out.flush();
+        }finally { 
+            out.close();
+        }
     }
 }

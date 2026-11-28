@@ -54,13 +54,15 @@ public class SearchServlet extends FTServlet {
             
 
         } catch (FTException e) {
-            System.out.println("\nError while accessing to FoodTinder:\n" + e.getMessage());
+            System.out.println("\nSearchServlet: Error while accessing to FoodTinder:\n" + e.getMessage());
             out.print("{\"state_flag\": \"0\"}");
             out.flush();
         } catch (NumberFormatException nfe) {
-            System.out.println("\nUnable to determine ID:\n" + nfe.getMessage());
+            System.out.println("\nSearchServlet: Unable to determine ID:\n" + nfe.getMessage());
             out.print("{\"state_flag\": \"0\"}");
             out.flush();
+        } finally {
+            out.close();
         }
         
         

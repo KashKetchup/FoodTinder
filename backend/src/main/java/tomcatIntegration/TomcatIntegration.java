@@ -4,8 +4,9 @@ package tomcatIntegration;
 import database.DatabaseService;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
+import tinderBack.ChallengePool;
 import tinderBack.FoodTinder;
-import java.util.WeakHashMap;
+//import java.util.WeakHashMap;
 
 public class TomcatIntegration {
     public static DatabaseService getDataBase(ServletContext ctx) 
@@ -28,9 +29,9 @@ public class TomcatIntegration {
     public static FoodTinder getFoodTinder(ServletContext ctx) throws TomcatIntegrationException, ServletException {
         FoodTinder result = (FoodTinder)ctx.getAttribute("tinderBack.FoodTinder");
         if (result == null) {
-            WeakHashMap
+            ChallengePool challengePool = new ChallengePool();
             DatabaseService dbs = getDataBase(ctx);
-            result = new FoodTinder(dbs);
+            result = new FoodTinder(dbs, challengePool);
             ctx.setAttribute("tinderBack.FoodTinder", result);
         }
         return result;

@@ -11,39 +11,58 @@
         <servlet-name>recipePage</servlet-name>
         <servlet-class>com.example.RecipePageServlet</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>recipePage</servlet-name>
         <url-pattern>/backend/recipe</url-pattern>
     </servlet-mapping>
     
+
     <servlet>
         <servlet-name>recipes</servlet-name>
         <servlet-class>com.example.RecipeServlet</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>recipes</servlet-name>
         <url-pattern>/backend/recipes</url-pattern>
     </servlet-mapping>
 	
+
 	<servlet>
         <servlet-name>dietPage</servlet-name>
         <servlet-class>com.example.DietPageServlet</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>dietPage</servlet-name>
         <url-pattern>/backend/diet</url-pattern>
     </servlet-mapping>
 	
+
     <servlet>
         <servlet-name>diets</servlet-name>
         <servlet-class>com.example.DietsServlet</servlet-class>
     </servlet>
-
     <servlet-mapping>
         <servlet-name>diets</servlet-name>
         <url-pattern>/backend/diets</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>register</servlet-name>
+        <servlet-class>com.example.RegisterServlet.java</servlet-class>
+    <servlet>
+    <servlet-mapping>
+        <servlet-name>register</servlet-name>
+        <url-pattern>/backend/register</url-pattern>
+    </servlet-mapping>
+
+
+    <servlet>
+        <servlet-name>login</servlet-name>
+        <servlet-class>com.example.LoginServlet.java</servlet-class>
+    <servlet>
+    <servlet-mapping>
+        <servlet-name>login</servlet-name>
+        <url-pattern>/backend/login</url-pattern>
     </servlet-mapping>
 </web-app>

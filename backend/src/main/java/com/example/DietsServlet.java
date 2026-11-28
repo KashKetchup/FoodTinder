@@ -25,12 +25,6 @@ public class DietsServlet extends FTServlet{
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
     throws ServletException, IOException {
 
-        //Настройка для работы с React
-
-//        resp.setHeader("Access-Control-Allow-Origin", "http://localhost:3000");
-//        resp.setHeader("Access-Control-Allow-Methods", "GET, POST");
-//        resp.setHeader("Access-Control-Allow-Headers", "Content-Type");
-
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
 
@@ -57,9 +51,11 @@ public class DietsServlet extends FTServlet{
             		.collect(Collectors.joining(", ")), ']'));
             out.flush();
         } catch (FTException e) {
-            System.out.println("\nError while accessing to FoodTinder:\n" + e.getMessage());
+            System.out.println("\nDietsServlet: Error while accessing to FoodTinder:\n" + e.getMessage());
         } catch (NumberFormatException nfe) {
-            System.out.println("\nUnable to determine ID:\n" + nfe.getMessage());
+            System.out.println("\nDietsServlet: Unable to determine ID:\n" + nfe.getMessage());
+        } finally {
+            out.close();
         }
         
     }
@@ -73,7 +69,7 @@ public class DietsServlet extends FTServlet{
                 }
             }
         } catch (NumberFormatException nfe) {
-            System.out.println("\nUnable to determine ID:\n" + nfe.getMessage());
+            System.out.println("\nDietsServlet:Unable to determine ID:\n" + nfe.getMessage());
         } // Хотим просто вернуть, что было
 
         return result;

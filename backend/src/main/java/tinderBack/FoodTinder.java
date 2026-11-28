@@ -1,7 +1,6 @@
 package tinderBack;
 
 import java.util.Set;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import database.*;
@@ -11,8 +10,10 @@ import database.*;
 public class FoodTinder {
 
     private final DatabaseService m_dbService;
+    private final ChallengePool m_challengePool;
 
-    public FoodTinder(DatabaseService dbService) {
+    public FoodTinder(DatabaseService dbService, ChallengePool pool) {
+        m_challengePool = pool;
         m_dbService = dbService;
     }
 
@@ -99,5 +100,47 @@ base:      	for (Recipe breakfast : breakfasts) {
             throw new FTException(dbe.getMessage());
         }
     }
+
+    public String getSalt() throws FTException {
+        try {
+            return m_dbService.getSalt();
+        } catch (DBException dbe) {
+            throw new FTException(dbe.getMessage());
+        }
+    }
+
+    public void addUserQuery(String login, String password) throws FTException {
+        try {
+            return m_dbService.addUser(login, password);
+        } catch (DBException dbe) {
+            throw new FTException(dbe.getMessage());
+        }
+    }
+
+    public String getPassByLogin(String login) throws FTException {
+        try {
+            return m_dbService.getPassByLogin(login);
+        } catch (DBException dbe) {
+            throw new FTException(dbe.getMessage());
+        }
+    }
+
+    public String addToken(String token, long currentTime) throws FTException {
+        try {
+            return m_dbService.addToken(token, currentTime);
+        } catch (DBException dbe) {
+            throw new FTException(dbe.getMessage());
+        }
+    }
+
+    public String getChallenge() {
+        return m_challengePool.getChallenge();
+    }
+
+    public boolean checkChallenge(String challenge) {
+        return m_challengePool.checkChallenge(challenge);
+    }
+
+
     
 }

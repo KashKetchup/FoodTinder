@@ -32,7 +32,7 @@ public class RecipePageServlet extends FTServlet{
             Recipe recipe = foodTinder.getRecipe(id);
             String jsonOut;
             if (recipe == null) {
-            	jsonOut = "{}";
+            	jsonOut = "{\"state_flag\": \"1\"}";
             } else {
             	jsonOut = String.format(
 	                "{\"id\": \"%d\"" + 
@@ -59,13 +59,17 @@ public class RecipePageServlet extends FTServlet{
             out.flush();
 
         } catch (FTException e) {
-            System.out.println("\nError while accessing to FoodTinder:\n" + e.getMessage());
+            System.out.println("\nRecipePageServlet: Error while accessing to FoodTinder:\n" 
+                + e.getMessage());
             out.print("{\"state_flag\": \"0\"}");
             out.flush();
         } catch (NumberFormatException nfe) {
-            System.out.println("\nUnable to determine ID:\n" + nfe.getMessage());
+            System.out.println("\nRecipePageServlet: Unable to determine ID:\n" 
+                + nfe.getMessage());
             out.print("{\"state_flag\": \"0\"}");
             out.flush();
+        } finally {
+            out.close();
         }
         
         

@@ -53,9 +53,11 @@ public class RecipeServlet extends FTServlet{
 				.collect(Collectors.joining(", ")), ']'));
             out.flush();
         } catch (FTException e) {
-            System.out.println("\nError while accessing to FoodTinder:\n" + e.getMessage());
+            System.out.println("\nRecipeServlet: Error while accessing to FoodTinder:\n" + e.getMessage());
         } catch (NumberFormatException nfe) {
-            System.out.println("\nUnable to determine ID:\n" + nfe.getMessage());
+            System.out.println("\nRecipeServlet: Unable to determine ID:\n" + nfe.getMessage());
+        } finally {
+            out.close();
         }
         
     }
@@ -70,7 +72,7 @@ public class RecipeServlet extends FTServlet{
                 }
             }
         } catch (NumberFormatException nfe) {
-            System.out.println("\nUnable to determine ID:\n" + nfe.getMessage());
+            System.out.println("\nRecipeServlet: Unable to determine ID:\n" + nfe.getMessage());
         } // Хотим просто вернуть, что было
 
         return result;
